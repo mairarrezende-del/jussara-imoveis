@@ -1,4 +1,4 @@
-ï»¿'use client'
+'use client'
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -35,7 +35,7 @@ const TIPO_LABEL: Record<string, string> = {
   comercial: 'Comercial', chacara: 'ChâÃ­cara / SâÂ¡tio', fazenda: 'Fazenda'
 }
 
-const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do JacarâÂ®', 'Lavras']
+const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
 
 export default function Home() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
@@ -152,12 +152,12 @@ export default function Home() {
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: s.ouro, fontWeight: 600 }}>Jussara Ribeiro</span>
-          <span style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.6)', marginLeft: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Imââveis</span>
+          <span style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.6)', marginLeft: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Imóveis</span>
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#contato'].map((href, i) => (
             <a key={href} href={href} style={{ fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
-              {['InâÂ¡cio', 'Sobre', 'Imââveis', 'Contato'][i]}
+              {['Início', 'Sobre', 'Imóveis', 'Contato'][i]}
             </a>
           ))}
           <button onClick={() => document.getElementById('busca')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.6)', padding: '0.38rem 0.9rem', borderRadius: 1, fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
@@ -211,20 +211,20 @@ export default function Home() {
         <div style={{ position: 'relative', zIndex: 2, padding: '6vw 4vw 6vw 7vw', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.5rem' }}>
             <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
-            Corretora ImobiliâÃ­ria â¬Ã Campo Belo, MG
+            Corretora Imobiliária â¬Ã Campo Belo, MG
           </div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem' }}>
-            Realizando o sonho<br />de cada <em style={{ fontStyle: 'italic', color: s.ouro }}>famâÂ¡lia</em><br />com confianâÂºa
+            Realizando o sonho<br />de cada <em style={{ fontStyle: 'italic', color: s.ouro }}>família</em><br />com confiança
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, maxWidth: 390, marginBottom: '2rem', fontWeight: 300 }}>
-            Compra e venda de imââveis em Campo Belo e regiâÃºo. Atendimento personalizado, seguranâÂºa e mais de 15 anos de experiâÂ¬ncia.
+            Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.
           </p>
           <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
-            <a href="#imoveis" className="btn-ouro">Ver imââveis</a>
+            <a href="#imoveis" className="btn-ouro">Ver imóveis</a>
             <a href="#contato" className="btn-ghost">Fale comigo</a>
           </div>
           <div style={{ display: 'flex', gap: '2rem', marginTop: '3rem', paddingTop: '1.75rem', borderTop: `1px solid ${s.borda}`, flexWrap: 'wrap' }}>
-            {[['+ 200', 'Negââcios realizados'], ['15 +', 'Anos de experiâÂ¬ncia'], ['100%', 'Compromisso']].map(([n, l]) => (
+            {[['+ 200', 'Negócios realizados'], ['15 +', 'Anos de experiência'], ['100%', 'Compromisso']].map(([n, l]) => (
               <div key={l}>
                 <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: s.ouro, lineHeight: 1, display: 'block' }}>{n}</span>
                 <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', display: 'block', marginTop: '0.28rem' }}>{l}</span>
@@ -250,7 +250,7 @@ export default function Home() {
       {/* BUSCA */}
       <div id="busca" style={{ background: s.verde, padding: '2rem 5vw' }}>
         <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderRadius: 2, padding: '1.4rem 1.75rem' }}>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>Â­ÆÃ¶Ã¬ Buscar imââveis</p>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>Â­ÆÃ¶Ã¬ Buscar imóveis</p>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
             {[
               { id: 'b-txt', label: 'Palavra-chave', placeholder: 'Ex: casa 3 quartos...', key: 'texto' },
@@ -308,12 +308,12 @@ export default function Home() {
           </span>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>Jussara Ribeiro</h2>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300 }}>
-            Sou corretora imobiliâÃ­ria com mais de 15 anos de atuaâÂºâÃºo em Campo Belo e regiâÃºo, especializada em compra e venda de imââveis residenciais e comerciais.
+            Sou corretora imobiliâÃ­ria com mais de 15 anos de atuaâÂºâÃºo em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
           </p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300 }}>
-            Meu trabalho âÂ® construâÂ¡do sobre dois pilares: transparâÂ¬ncia e confianâÂºa. Cada negociaâÂºâÃºo âÂ® tratada com mâÃ­xima atenâÂºâÃºo e responsabilidade.
+            Meu trabalho âÂ® construâÂ¡do sobre dois pilares: transparência e confiança. Cada negociaâÂºâÃºo âÂ® tratada com mâÃ­xima atenâÂºâÃºo e responsabilidade.
           </p>
-          {['Especialista em imââveis residenciais e comerciais', 'AtuaâÂºâÃºo em Campo Belo, Candeias, Cristais, Lavras e regiâÃºo', 'Parceria com cartâârios e assessoria jurâÂ¡dica', 'AvaliaâÂºâÃºo gratuita do seu imââvel'].map(item => (
+          {['Especialista em imóveis residenciais e comerciais', 'AtuaâÂºâÃºo em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurâÂ¡dica', 'AvaliaâÂºâÃºo gratuita do seu imââvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
             </div>
@@ -333,9 +333,9 @@ export default function Home() {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1.25rem' }}>
           <div>
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
-              Portfââlio <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
+              Portfólio <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
             </span>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imââveis disponâÂ¡veis</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponâÂ¡veis</h2>
           </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[['', 'Todos'], ['casa', 'Casas'], ['apartamento', 'Apartamentos'], ['lote', 'Lotes'], ['rural', 'Rural']].map(([v, l]) => (
@@ -346,7 +346,7 @@ export default function Home() {
 
         {imoveisFiltrados.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: s.cinza, border: `1.5px dashed rgba(4,49,55,0.1)`, borderRadius: 2 }}>
-            <p style={{ fontSize: '0.85rem' }}>Nenhum imââvel encontrado. Adicione imââveis pelo painel admin.</p>
+            <p style={{ fontSize: '0.85rem' }}>Nenhum imââvel encontrado. Adicione imóveis pelo painel admin.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '1.6rem' }}>
@@ -403,7 +403,7 @@ export default function Home() {
             { icon: 'Â­ÆÃ´â', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
             { icon: 'Â­ÆÃ´Â©', label: 'Instagram', value: '@jussara_ribeirocorretora', href: 'https://www.instagram.com/jussara_ribeirocorretora/' },
             { icon: 'Â­ÆÃ´Ã¿', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: 'https://www.facebook.com/jussararibeirocorretora' },
-            { icon: 'Â­ÆÃ´Ã¬', label: 'LocalizaâÂºâÃºo', value: 'Campo Belo ÃÃÃ¶ MG e regiâÃºo', href: undefined },
+            { icon: 'Â­ÆÃ´Ã¬', label: 'LocalizaâÂºâÃºo', value: 'Campo Belo ÃÃÃ¶ MG e região', href: undefined },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', marginBottom: '1.35rem' }}>
               <div style={{ width: 42, height: 42, flexShrink: 0, border: `1px solid rgba(223,192,120,0.28)`, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1, fontSize: '1rem' }}>{item.icon}</div>
@@ -456,7 +456,7 @@ export default function Home() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Mensagem</label>
-                <textarea id="f-msg" placeholder="Descreva o que vocâÂ¬ procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
+                <textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
                 Enviar pelo WhatsApp
@@ -512,7 +512,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imââveis</span>
+        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
         <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>â¬Â® 2025 â¬Ã Campo Belo, MG â¬Ã Todos os direitos reservados</span>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 â¬Ã CRECI-MG 46481</span>
       </footer>

@@ -1,4 +1,4 @@
-ï»¿'use client'
+'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -32,7 +32,7 @@ type Slide = {
   ativo: boolean
 }
 
-const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do JacarâÂ®', 'Lavras']
+const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
 const TIPOS = { casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno', comercial: 'Comercial', chacara: 'ChâÃ­cara / SâÂ¡tio', fazenda: 'Fazenda' }
 
 const s = {
@@ -166,7 +166,7 @@ export default function AdminPage() {
       <div style={{ background: '#021e22', borderBottom: `1px solid ${s.borda}`, padding: '1rem 3vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.4rem', fontWeight: 400 }}>ÃÃÃ Painel Admin</h1>
-          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>Jussara Ribeiro Imââveis</p>
+          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>Jussara Ribeiro Imóveis</p>
         </div>
         <a href="/" target="_blank" style={{ fontSize: '0.72rem', color: s.ouro, textDecoration: 'none', border: `1px solid rgba(223,192,120,0.3)`, padding: '0.4rem 0.9rem', borderRadius: 1 }}>Ver site ÃÃ¥Ã</a>
       </div>
@@ -180,7 +180,7 @@ export default function AdminPage() {
 
       {/* ABAS */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw' }}>
-        {[['imoveis', 'Â­ÆÃÃ¡ Imââveis'], ['carrossel', 'Â­ÆÃÃ¡ Carrossel'], ['novo', '+ Novo Imââvel']].map(([v, l]) => (
+        {[['imoveis', 'Â­ÆÃÃ¡ Imóveis'], ['carrossel', 'Â­ÆÃÃ¡ Carrossel'], ['novo', '+ Novo Imââvel']].map(([v, l]) => (
           <button key={v} onClick={() => { setAba(v); if (v === 'novo') setEditando({ ...imovelVazio }) }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1 }}>
             {l}
           </button>
@@ -193,7 +193,7 @@ export default function AdminPage() {
         {aba === 'imoveis' && !editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Imââveis cadastrados ({imoveis.length})</h2>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Imóveis cadastrados ({imoveis.length})</h2>
               <button onClick={() => { setAba('novo'); setEditando({ ...imovelVazio }) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imââvel</button>
             </div>
             {imoveis.length === 0 ? (
@@ -386,7 +386,7 @@ export default function AdminPage() {
                     <div>
                       <div style={campo}>
                         <label style={lbl}>Legenda principal</label>
-                        <input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: Imââveis exclusivos em Campo Belo" />
+                        <input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: Imóveis exclusivos em Campo Belo" />
                       </div>
                       <div style={campo}>
                         <label style={lbl}>SubtâÂ¡tulo</label>
