@@ -11,7 +11,8 @@ type Imovel = {
   tipo: string
   zona: string
   cidade: string
-  bairro: string`n  endereco: string
+  bairro: string
+  endereco: string
   area: number
   quartos: number
   banheiros: number
@@ -524,4 +525,5 @@ export default function Home() {
     </>
   )
 }
+
 
