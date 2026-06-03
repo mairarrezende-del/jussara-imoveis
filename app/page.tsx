@@ -94,7 +94,7 @@ export default function Home() {
     const email = (f.querySelector('#f-email') as HTMLInputElement).value
     const interesse = (f.querySelector('#f-int') as HTMLSelectElement).value
     const msg = (f.querySelector('#f-msg') as HTMLTextAreaElement).value
-    const txt = encodeURIComponent(`OlâÃ­, Jussara! Â­ÆÃ¦Ã¯\n\nMeu nome é *${nome}*.\nÂ­ÆÃ´â ${tel}\nÂ­ÆÃ´Âº ${email}\nÂ­ÆÃÃ¡ ${interesse}\n\n${msg}`)
+    const txt = encodeURIComponent(`Olá, Jussara! 👋\n\nMeu nome é *${nome}*.\n📞 ${tel}\n📧 ${email}\n🏠 ${interesse}\n\n${msg}`)
     window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
   }
 
@@ -102,7 +102,7 @@ export default function Home() {
     e.preventDefault()
     const f = e.currentTarget
     const get = (id: string) => (f.querySelector(`#${id}`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)?.value || ''
-    const txt = encodeURIComponent(`OlâÃ­, Jussara! Tenho um imóvel para vender. Â­ÆÃÃ¡\n\nÂ­ÆÃ¦Ã± *${get('cap-nome')}*\nÂ­ÆÃ´â ${get('cap-tel')}\n\nÂ­ÆÃ´Ã¯ *Dados:*\nÃÃÃ³ Tipo: ${get('cap-tipo')}\nÃÃÃ³ Zona: ${get('cap-zona')}\nÃÃÃ³ Cidade: ${get('cap-cidade')}\nÃÃÃ³ Bairro: ${get('cap-bairro')}\nÃÃÃ³ âÃ¼rea: ${get('cap-area')} mâ¬â\nÃÃÃ³ Valor: R$ ${get('cap-valor')}\n\nÂ­ÆÃ´Ã ${get('cap-desc')}`)
+    const txt = encodeURIComponent(`Olá, Jussara! Tenho um imóvel para vender. 🏡\n\n👤 *${get('cap-nome')}*\n📞 ${get('cap-tel')}\n\n📋 *Dados:*\n• Tipo: ${get('cap-tipo')}\n• Zona: ${get('cap-zona')}\n• Cidade: ${get('cap-cidade')}\n• Bairro: ${get('cap-bairro')}\n• Área: ${get('cap-area')} m²\n• Valor: R$ ${get('cap-valor')}\n\n📝 ${get('cap-desc')}`)
     window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
   }
 
@@ -128,21 +128,21 @@ export default function Home() {
       {/* LIGHTBOX */}
       {lbOpen && lbImovel && (
         <div onClick={fecharLb} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(2,10,12,0.96)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <button onClick={fecharLb} style={{ position: 'fixed', top: '1rem', right: '1.5rem', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 40, height: 40, borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ÃÂ£Ã²</button>
+          <button onClick={fecharLb} style={{ position: 'fixed', top: '1rem', right: '1.5rem', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 40, height: 40, borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           {lbImovel.fotos && lbImovel.fotos.length > 0 ? (
             <img src={lbImovel.fotos[lbFotoIdx]} alt={lbImovel.titulo} style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 2 }} onClick={e => e.stopPropagation()} />
           ) : (
-            <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponável</div>
+            <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponível</div>
           )}
           {lbImovel.fotos && lbImovel.fotos.length > 1 && (
             <>
-              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.max(0, i - 1)) }} style={{ position: 'fixed', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === 0 ? 0.2 : 1 }}>ÃÃâ£</button>
-              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.min((lbImovel.fotos?.length || 1) - 1, i + 1)) }} style={{ position: 'fixed', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === (lbImovel.fotos?.length || 1) - 1 ? 0.2 : 1 }}>ÃÃâ</button>
+              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.max(0, i - 1)) }} style={{ position: 'fixed', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === 0 ? 0.2 : 1 }}>‹</button>
+              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.min((lbImovel.fotos?.length || 1) - 1, i + 1)) }} style={{ position: 'fixed', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === (lbImovel.fotos?.length || 1) - 1 ? 0.2 : 1 }}>›</button>
             </>
           )}
           <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.branco, fontSize: '1rem' }}>{lbImovel.titulo}</p>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.bairro} ÃÃÃ¶ {lbImovel.cidade}</p>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.bairro} • {lbImovel.cidade}</p>
             {lbImovel.fotos && <p style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.5)', marginTop: '0.3rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{lbFotoIdx + 1} de {lbImovel.fotos.length}</p>}
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function Home() {
             </a>
           ))}
           <button onClick={() => document.getElementById('busca')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.6)', padding: '0.38rem 0.9rem', borderRadius: 1, fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
-            Â­ÆÃ¶Ã¬ Buscar
+            🔍 Buscar
           </button>
           <a href={`https://wa.me/${WPP}`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: s.ouro, textDecoration: 'none', fontSize: '0.72rem' }}>
             <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
@@ -188,8 +188,8 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button onClick={() => carNav(-1)} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(4,49,55,0.45)', border: `1px solid rgba(223,192,120,0.35)`, color: s.ouro, width: 46, height: 46, borderRadius: '50%', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>ÃÃâ£</button>
-            <button onClick={() => carNav(1)} style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(4,49,55,0.45)', border: `1px solid rgba(223,192,120,0.35)`, color: s.ouro, width: 46, height: 46, borderRadius: '50%', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>ÃÃâ</button>
+            <button onClick={() => carNav(-1)} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(4,49,55,0.45)', border: `1px solid rgba(223,192,120,0.35)`, color: s.ouro, width: 46, height: 46, borderRadius: '50%', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>‹</button>
+            <button onClick={() => carNav(1)} style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(4,49,55,0.45)', border: `1px solid rgba(223,192,120,0.35)`, color: s.ouro, width: 46, height: 46, borderRadius: '50%', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>›</button>
             <div style={{ position: 'absolute', bottom: '0.9rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.45rem', zIndex: 2 }}>
               {slides.map((_, i) => (
                 <button key={i} onClick={() => setCarIdx(i)} style={{ width: i === carIdx ? 22 : 8, height: 8, borderRadius: i === carIdx ? 4 : '50%', background: i === carIdx ? s.ouro : 'rgba(255,255,255,0.3)', border: 'none', cursor: 'pointer', transition: 'all 0.3s', padding: 0 }} />
@@ -211,7 +211,7 @@ export default function Home() {
         <div style={{ position: 'relative', zIndex: 2, padding: '6vw 4vw 6vw 7vw', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.5rem' }}>
             <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
-            Corretora Imobiliária â¬Ã Campo Belo, MG
+            Corretora Imobiliária • Campo Belo, MG
           </div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem' }}>
             Realizando o sonho<br />de cada <em style={{ fontStyle: 'italic', color: s.ouro }}>família</em><br />com confiança
@@ -239,7 +239,7 @@ export default function Home() {
             </div>
             <div style={{ position: 'absolute', bottom: '1.25rem', left: '-1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1 }}>
               <strong style={{ fontSize: '0.82rem', fontWeight: 600, display: 'block' }}>CRECI 52583</strong>
-              <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Registro Ativo ÃÃÃ¶ MG</span>
+              <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Registro Ativo • MG</span>
             </div>
           </div>
         </div>
@@ -250,7 +250,7 @@ export default function Home() {
       {/* BUSCA */}
       <div id="busca" style={{ background: s.verde, padding: '2rem 5vw' }}>
         <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderRadius: 2, padding: '1.4rem 1.75rem' }}>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>Â­ÆÃ¶Ã¬ Buscar imóveis</p>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>🔍 Buscar imóveis</p>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
             {[
               { id: 'b-txt', label: 'Palavra-chave', placeholder: 'Ex: casa 3 quartos...', key: 'texto' },
@@ -311,31 +311,31 @@ export default function Home() {
             Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
           </p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300 }}>
-            Meu trabalho é construádo sobre dois pilares: transparência e confiança. Cada negociação é tratada com mâÃ­xima atenção e responsabilidade.
+            Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.
           </p>
-          {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurádica', 'Avaliação gratuita do seu imóvel'].map(item => (
+          {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
             </div>
           ))}
           <div style={{ marginTop: '1.75rem', padding: '0.9rem 1.4rem', borderLeft: `3px solid ${s.ouro}`, background: s.branco, borderRadius: '0 2px 2px 0' }}>
             <p style={{ fontSize: '0.75rem', color: s.cinza, marginBottom: '0.18rem' }}>Registros profissionais ativos</p>
-            <strong style={{ fontSize: '0.82rem', color: s.verde, fontWeight: 600 }}>CRECI-MG 52583 â¬Ã Jussara Ribeiro</strong><br />
-            <span style={{ fontSize: '0.78rem', color: s.cinza }}>CRECI-MG 46481 â¬Ã Denison Rezende</span>
+            <strong style={{ fontSize: '0.82rem', color: s.verde, fontWeight: 600 }}>CRECI-MG 52583 • Jussara Ribeiro</strong><br />
+            <span style={{ fontSize: '0.78rem', color: s.cinza }}>CRECI-MG 46481 • Denison Rezende</span>
           </div>
         </div>
       </section>
 
       <div className="divisor" />
 
-      {/* IMâÃ´VEIS */}
+      {/* IMÓVEIS */}
       <section id="imoveis" style={{ background: s.branco, padding: '5.5rem 7vw' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1.25rem' }}>
           <div>
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
               Portfólio <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
             </span>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponáveis</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponíveis</h2>
           </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[['', 'Todos'], ['casa', 'Casas'], ['apartamento', 'Apartamentos'], ['lote', 'Lotes'], ['rural', 'Rural']].map(([v, l]) => (
@@ -371,14 +371,14 @@ export default function Home() {
                   <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', fontWeight: 600, color: s.verde, marginBottom: '0.28rem', lineHeight: 1.3 }}>{im.titulo}</p>
                   <p style={{ fontSize: '0.72rem', color: s.cinza, marginBottom: '0.75rem' }}>{im.bairro}{im.bairro ? ', ' : ''}{im.cidade}</p>
                   <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '0.9rem', flexWrap: 'wrap' }}>
-                    {im.quartos > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>Â­ÆÃ¸Ã {im.quartos} quartos</span>}
-                    {im.area > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>Â­ÆÃ´Ã {im.area} mâ¬â</span>}
+                    {im.quartos > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>🛏 {im.quartos} quartos</span>}
+                    {im.area > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>📐 {im.area} m²</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid rgba(4,49,55,0.07)`, paddingTop: '0.9rem' }}>
                     <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
                       {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}
                     </p>
-                    <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Ver detalhes ÃÃ¥Ã</Link>
+                    <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Ver detalhes →</Link>
                   </div>
                 </div>
               </div>
@@ -400,10 +400,10 @@ export default function Home() {
             Entre em contato para agendar uma visita ou solicitar avaliação gratuita.
           </p>
           {[
-            { icon: 'Â­ÆÃ´â', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
-            { icon: 'Â­ÆÃ´Â©', label: 'Instagram', value: '@jussara_ribeirocorretora', href: 'https://www.instagram.com/jussara_ribeirocorretora/' },
-            { icon: 'Â­ÆÃ´Ã¿', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: 'https://www.facebook.com/jussararibeirocorretora' },
-            { icon: 'Â­ÆÃ´Ã¬', label: 'Localização', value: 'Campo Belo ÃÃÃ¶ MG e região', href: undefined },
+            { icon: '📞', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
+            { icon: '📷', label: 'Instagram', value: '@jussara_ribeirocorretora', href: 'https://www.instagram.com/jussara_ribeirocorretora/' },
+            { icon: '📘', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: 'https://www.facebook.com/jussararibeirocorretora' },
+            { icon: '📍', label: 'Localização', value: 'Campo Belo • MG e região', href: undefined },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', marginBottom: '1.35rem' }}>
               <div style={{ width: 42, height: 42, flexShrink: 0, border: `1px solid rgba(223,192,120,0.28)`, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1, fontSize: '1rem' }}>{item.icon}</div>
@@ -414,8 +414,8 @@ export default function Home() {
             </div>
           ))}
           <div style={{ marginTop: '2rem', paddingTop: '1.35rem', borderTop: `1px solid rgba(223,192,120,0.12)`, fontSize: '0.68rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em', lineHeight: 1.8 }}>
-            CRECI-MG 52583 â¬Ã Jussara Ribeiro | CRECI-MG 46481 â¬Ã Denison Rezende<br />
-            Registros profissionais ativos â¬Ã Compra e Venda
+            CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende<br />
+            Registros profissionais ativos • Compra e Venda
           </div>
         </div>
         <div>
@@ -465,7 +465,7 @@ export default function Home() {
           </div>
 
           <div id="cp-1" style={{ paddingTop: '1.4rem', display: 'none' }}>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imóvel âÃ¡ venda? Preencha o formulâÃ­rio e Jussara entrarâÃ­ em contato.</p>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imóvel à venda? Preencha o formulário e Jussara entrará em contato.</p>
             <form onSubmit={enviarCaptacao} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                 {[{ id: 'cap-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'cap-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
@@ -491,7 +491,7 @@ export default function Home() {
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                {[{ id: 'cap-cidade', label: 'Cidade', placeholder: 'Ex: Campo Belo' }, { id: 'cap-bairro', label: 'Bairro', placeholder: 'Ex: Centro' }, { id: 'cap-area', label: 'âÃ¼rea (mâ¬â)', placeholder: 'Ex: 250' }, { id: 'cap-valor', label: 'Valor pretendido', placeholder: 'Ex: 350.000' }].map(f => (
+                {[{ id: 'cap-cidade', label: 'Cidade', placeholder: 'Ex: Campo Belo' }, { id: 'cap-bairro', label: 'Bairro', placeholder: 'Ex: Centro' }, { id: 'cap-area', label: 'Área (m²)', placeholder: 'Ex: 250' }, { id: 'cap-valor', label: 'Valor pretendido', placeholder: 'Ex: 350.000' }].map(f => (
                   <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                     <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
                     <input id={f.id} placeholder={f.placeholder} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
@@ -513,13 +513,13 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
-        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>â¬Â® 2025 â¬Ã Campo Belo, MG â¬Ã Todos os direitos reservados</span>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 â¬Ã CRECI-MG 46481</span>
+        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2025 • Campo Belo — Todos os direitos reservados</span>
+        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende</span>
       </footer>
 
       {/* WPP FLOAT */}
       <a href={`https://wa.me/${WPP}`} target="_blank" style={{ position: 'fixed', bottom: '1.75rem', right: '1.75rem', zIndex: 400, background: '#25D366', color: 'white', width: 56, height: 56, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', boxShadow: '0 4px 18px rgba(37,211,102,0.38)', fontSize: '1.5rem' }}>
-        Â­ÆÃÂ¼
+        💬
       </a>
     </>
   )
