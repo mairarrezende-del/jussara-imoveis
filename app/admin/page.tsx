@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -32,8 +32,8 @@ type Slide = {
   ativo: boolean
 }
 
-const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
-const TIPOS = { casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno', comercial: 'Comercial', chacara: 'Chácara / Sítio', fazenda: 'Fazenda' }
+const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do JacarÃ©', 'Lavras']
+const TIPOS = { casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno', comercial: 'Comercial', chacara: 'ChÃ¡cara / SÃ­tio', fazenda: 'Fazenda' }
 
 const s = {
   verde: '#043137', verdeM: '#065460', ouro: '#DFC078', ouroC: '#EDD49A',
@@ -86,13 +86,13 @@ export default function AdminPage() {
       erro = r.error
     }
     setSalvando(false)
-    if (erro) { setMsg('❌ Erro: ' + erro.message) }
-    else { setMsg('✅ Imóvel salvo!'); setEditando(null); fetchImoveis() }
+    if (erro) { setMsg('âŒ Erro: ' + erro.message) }
+    else { setMsg('âœ… ImÃ³vel salvo!'); setEditando(null); fetchImoveis() }
     setTimeout(() => setMsg(''), 3000)
   }
 
   async function excluirImovel(id: string) {
-    if (!confirm('Excluir este imóvel?')) return
+    if (!confirm('Excluir este imÃ³vel?')) return
     await supabase.from('imoveis').delete().eq('id', id)
     fetchImoveis()
   }
@@ -108,8 +108,8 @@ export default function AdminPage() {
       erro = r.error
     }
     setSalvando(false)
-    if (erro) setMsg('❌ Erro: ' + erro.message)
-    else { setMsg('✅ Slide salvo!'); fetchSlides() }
+    if (erro) setMsg('âŒ Erro: ' + erro.message)
+    else { setMsg('âœ… Slide salvo!'); fetchSlides() }
     setTimeout(() => setMsg(''), 3000)
   }
 
@@ -130,27 +130,27 @@ export default function AdminPage() {
   async function handleFotosImovel(files: FileList) {
     if (!editando) return
     setSalvando(true)
-    setMsg('⏳ Enviando fotos...')
+    setMsg('â³ Enviando fotos...')
     const urls: string[] = []
     for (const file of Array.from(files)) {
       try { urls.push(await uploadFoto(file, 'imovel')) } catch (e) { console.error(e) }
     }
     setEditando({ ...editando, fotos: [...(editando.fotos || []), ...urls] })
     setSalvando(false)
-    setMsg('✅ Fotos adicionadas!')
+    setMsg('âœ… Fotos adicionadas!')
     setTimeout(() => setMsg(''), 2000)
   }
 
   async function handleFotoSlide(file: File, slide: Slide, idx: number) {
     setSalvando(true)
-    setMsg('⏳ Enviando imagem...')
+    setMsg('â³ Enviando imagem...')
     try {
       const url = await uploadFoto(file, 'carrossel')
       const novos = [...slides]
       novos[idx] = { ...slide, imagem: url }
       setSlides(novos)
-      setMsg('✅ Imagem carregada! Clique em Salvar.')
-    } catch { setMsg('❌ Erro ao enviar imagem') }
+      setMsg('âœ… Imagem carregada! Clique em Salvar.')
+    } catch { setMsg('âŒ Erro ao enviar imagem') }
     setSalvando(false)
     setTimeout(() => setMsg(''), 3000)
   }
@@ -165,22 +165,22 @@ export default function AdminPage() {
       {/* HEADER */}
       <div style={{ background: '#021e22', borderBottom: `1px solid ${s.borda}`, padding: '1rem 3vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.4rem', fontWeight: 400 }}>⚙ Painel Admin</h1>
-          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>Jussara Ribeiro Imóveis</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.4rem', fontWeight: 400 }}>âš™ Painel Admin</h1>
+          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>Jussara Ribeiro ImÃ³veis</p>
         </div>
-        <a href="/" target="_blank" style={{ fontSize: '0.72rem', color: s.ouro, textDecoration: 'none', border: `1px solid rgba(223,192,120,0.3)`, padding: '0.4rem 0.9rem', borderRadius: 1 }}>Ver site →</a>
+        <a href="/" target="_blank" style={{ fontSize: '0.72rem', color: s.ouro, textDecoration: 'none', border: `1px solid rgba(223,192,120,0.3)`, padding: '0.4rem 0.9rem', borderRadius: 1 }}>Ver site â†’</a>
       </div>
 
       {/* MENSAGEM */}
       {msg && (
-        <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>
+        <div style={{ background: msg.includes('âŒ') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('âŒ') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>
           {msg}
         </div>
       )}
 
       {/* ABAS */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw' }}>
-        {[['imoveis', '🏠 Imóveis'], ['carrossel', '🎠 Carrossel'], ['novo', '+ Novo Imóvel']].map(([v, l]) => (
+        {[['imoveis', 'ðŸ  ImÃ³veis'], ['carrossel', 'ðŸŽ  Carrossel'], ['novo', '+ Novo ImÃ³vel']].map(([v, l]) => (
           <button key={v} onClick={() => { setAba(v); if (v === 'novo') setEditando({ ...imovelVazio }) }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1 }}>
             {l}
           </button>
@@ -189,17 +189,17 @@ export default function AdminPage() {
 
       <div style={{ padding: '2rem 3vw' }}>
 
-        {/* ABA IMÓVEIS */}
+        {/* ABA IMÃ“VEIS */}
         {aba === 'imoveis' && !editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Imóveis cadastrados ({imoveis.length})</h2>
-              <button onClick={() => { setAba('novo'); setEditando({ ...imovelVazio }) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imóvel</button>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>ImÃ³veis cadastrados ({imoveis.length})</h2>
+              <button onClick={() => { setAba('novo'); setEditando({ ...imovelVazio }) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imÃ³vel</button>
             </div>
             {imoveis.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}>
-                <p style={{ fontSize: '0.9rem' }}>Nenhum imóvel cadastrado ainda.</p>
-                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Clique em "+ Novo imóvel" para começar.</p>
+                <p style={{ fontSize: '0.9rem' }}>Nenhum imÃ³vel cadastrado ainda.</p>
+                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Clique em "+ Novo imÃ³vel" para comeÃ§ar.</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -209,11 +209,11 @@ export default function AdminPage() {
                       {im.fotos && im.fotos.length > 0 ? (
                         <img src={im.fotos[0]} alt={im.titulo} style={{ width: 64, height: 48, objectFit: 'cover', borderRadius: 1 }} />
                       ) : (
-                        <div style={{ width: 64, height: 48, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🏠</div>
+                        <div style={{ width: 64, height: 48, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>ðŸ </div>
                       )}
                       <div>
                         <p style={{ color: s.branco, fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.2rem' }}>{im.titulo}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.75rem' }}>{im.cidade} · {TIPOS[im.tipo as keyof typeof TIPOS] || im.tipo} · {im.zona} · {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}</p>
+                        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.75rem' }}>{im.cidade} Â· {TIPOS[im.tipo as keyof typeof TIPOS] || im.tipo} Â· {im.zona} Â· {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}</p>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -228,23 +228,23 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* FORMULÁRIO IMÓVEL (novo ou editar) */}
+        {/* FORMULÃRIO IMÃ“VEL (novo ou editar) */}
         {(aba === 'novo' || aba === 'editar') && editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem 0.8rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>← Voltar</button>
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>{editando.id ? 'Editar imóvel' : 'Novo imóvel'}</h2>
+              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem 0.8rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>â† Voltar</button>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>{editando.id ? 'Editar imÃ³vel' : 'Novo imÃ³vel'}</h2>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
               <div>
                 <div style={campo}>
-                  <label style={lbl}>Título *</label>
+                  <label style={lbl}>TÃ­tulo *</label>
                   <input style={inp()} value={editando.titulo} onChange={e => setEditando({ ...editando, titulo: e.target.value, slug: gerarSlug(e.target.value) })} placeholder="Ex: Casa residencial 3 quartos" />
                 </div>
                 <div style={campo}>
-                  <label style={lbl}>Descrição</label>
-                  <textarea style={{ ...inp(), minHeight: 100, resize: 'vertical' }} value={editando.descricao} onChange={e => setEditando({ ...editando, descricao: e.target.value })} placeholder="Descreva o imóvel..." />
+                  <label style={lbl}>DescriÃ§Ã£o</label>
+                  <textarea style={{ ...inp(), minHeight: 100, resize: 'vertical' }} value={editando.descricao} onChange={e => setEditando({ ...editando, descricao: e.target.value })} placeholder="Descreva o imÃ³vel..." />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div style={campo}>
@@ -271,11 +271,11 @@ export default function AdminPage() {
                     <input style={inp()} value={editando.bairro} onChange={e => setEditando({ ...editando, bairro: e.target.value })} placeholder="Ex: Centro" />
                   </div>
                   <div style={campo}>
-                    <label style={lbl}>Preço (R$)</label>
+                    <label style={lbl}>PreÃ§o (R$)</label>
                     <input style={inp()} type="number" value={editando.preco || ''} onChange={e => setEditando({ ...editando, preco: Number(e.target.value) })} placeholder="Ex: 380000" />
                   </div>
                   <div style={campo}>
-                    <label style={lbl}>Área (m²)</label>
+                    <label style={lbl}>Ãrea (mÂ²)</label>
                     <input style={inp()} type="number" value={editando.area || ''} onChange={e => setEditando({ ...editando, area: Number(e.target.value) })} placeholder="Ex: 120" />
                   </div>
                   <div style={campo}>
@@ -288,37 +288,37 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div style={campo}>
-                  <label style={lbl}>Link do vídeo (YouTube ou Instagram)</label>
+                  <label style={lbl}>Link do vÃ­deo (YouTube ou Instagram)</label>
                   <input style={inp()} value={editando.video_url} onChange={e => setEditando({ ...editando, video_url: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." />
                 </div>
                 <div style={campo}>
                   <label style={lbl}>Status</label>
                   <select style={{ ...inp(), background: s.verde }} value={editando.status} onChange={e => setEditando({ ...editando, status: e.target.value })}>
-                    <option value="disponivel">Disponível</option>
+                    <option value="disponivel">DisponÃ­vel</option>
                     <option value="reservado">Reservado</option>
                     <option value="vendido">Vendido</option>
                   </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                   <input type="checkbox" id="destaque" checked={editando.destaque} onChange={e => setEditando({ ...editando, destaque: e.target.checked })} />
-                  <label htmlFor="destaque" style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Destacar este imóvel na página inicial</label>
+                  <label htmlFor="destaque" style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Destacar este imÃ³vel na pÃ¡gina inicial</label>
                 </div>
               </div>
 
               <div>
                 <div style={campo}>
-                  <label style={lbl}>Fotos do imóvel</label>
+                  <label style={lbl}>Fotos do imÃ³vel</label>
                   <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', position: 'relative' }}>
                     <input type="file" multiple accept="image/*" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
-                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>📷 Clique para adicionar fotos</p>
-                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP · Múltiplas fotos permitidas</p>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>ðŸ“· Clique para adicionar fotos</p>
+                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP Â· MÃºltiplas fotos permitidas</p>
                   </div>
                   {editando.fotos && editando.fotos.length > 0 && (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.75rem' }}>
                       {editando.fotos.map((url, i) => (
                         <div key={i} style={{ position: 'relative' }}>
                           <img src={url} alt={`Foto ${i + 1}`} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 1 }} />
-                          <button onClick={() => setEditando({ ...editando, fotos: editando.fotos.filter((_, j) => j !== i) })} style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(200,50,50,0.8)', border: 'none', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          <button onClick={() => setEditando({ ...editando, fotos: editando.fotos.filter((_, j) => j !== i) })} style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(200,50,50,0.8)', border: 'none', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>âœ•</button>
                         </div>
                       ))}
                     </div>
@@ -327,7 +327,7 @@ export default function AdminPage() {
 
                 {editando.video_url && (
                   <div style={campo}>
-                    <label style={lbl}>Preview do vídeo</label>
+                    <label style={lbl}>Preview do vÃ­deo</label>
                     {editando.video_url.includes('youtube') || editando.video_url.includes('youtu.be') ? (
                       <iframe
                         src={`https://www.youtube.com/embed/${editando.video_url.split('v=')[1]?.split('&')[0] || editando.video_url.split('youtu.be/')[1]}`}
@@ -335,13 +335,13 @@ export default function AdminPage() {
                         allowFullScreen
                       />
                     ) : (
-                      <a href={editando.video_url} target="_blank" style={{ color: s.ouro, fontSize: '0.8rem' }}>Ver vídeo no Instagram →</a>
+                      <a href={editando.video_url} target="_blank" style={{ color: s.ouro, fontSize: '0.8rem' }}>Ver vÃ­deo no Instagram â†’</a>
                     )}
                   </div>
                 )}
 
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid rgba(223,192,120,0.1)`, borderRadius: 2, padding: '1rem', marginBottom: '1rem' }}>
-                  <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>URL amigável (slug)</p>
+                  <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>URL amigÃ¡vel (slug)</p>
                   <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', wordBreak: 'break-all' }}>/imoveis/{editando.slug || gerarSlug(editando.titulo) || 'sera-gerado-automaticamente'}</p>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function AdminPage() {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', paddingTop: '1.5rem', borderTop: `1px solid rgba(223,192,120,0.1)` }}>
               <button onClick={salvarImovel} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
-                {salvando ? 'Salvando...' : '✓ Salvar imóvel'}
+                {salvando ? 'Salvando...' : 'âœ“ Salvar imÃ³vel'}
               </button>
               <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.45)', padding: '0.9rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', cursor: 'pointer', borderRadius: 1 }}>
                 Cancelar
@@ -362,10 +362,10 @@ export default function AdminPage() {
         {aba === 'carrossel' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Carrossel da página inicial</h2>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Carrossel da pÃ¡gina inicial</h2>
               <button onClick={() => { const novo: Slide = { imagem: '', legenda: 'Novo slide', subtitulo: '', ordem: slides.length, ativo: true }; setSlides([...slides, novo]) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo slide</button>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginBottom: '1.5rem' }}>Recomendado: imagens 1400 × 500 px, formato JPG ou PNG.</p>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginBottom: '1.5rem' }}>Recomendado: imagens 1400 Ã— 500 px, formato JPG ou PNG.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {slides.map((sl, idx) => (
                 <div key={sl.id || idx} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.25rem' }}>
@@ -374,7 +374,7 @@ export default function AdminPage() {
                       {sl.imagem ? (
                         <img src={sl.imagem} alt={sl.legenda} style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} />
                       ) : (
-                        <div style={{ width: '100%', height: 100, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '0.5rem' }}>🖼️</div>
+                        <div style={{ width: '100%', height: 100, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '0.5rem' }}>ðŸ–¼ï¸</div>
                       )}
                       <div style={{ position: 'relative' }}>
                         <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleFotoSlide(e.target.files[0], sl, idx)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
@@ -386,10 +386,10 @@ export default function AdminPage() {
                     <div>
                       <div style={campo}>
                         <label style={lbl}>Legenda principal</label>
-                        <input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: Imóveis exclusivos em Campo Belo" />
+                        <input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: ImÃ³veis exclusivos em Campo Belo" />
                       </div>
                       <div style={campo}>
-                        <label style={lbl}>Subtítulo</label>
+                        <label style={lbl}>SubtÃ­tulo</label>
                         <input style={inp()} value={sl.subtitulo} onChange={e => { const n = [...slides]; n[idx] = { ...sl, subtitulo: e.target.value }; setSlides(n) }} placeholder="Ex: Compra e venda com quem entende" />
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -412,7 +412,7 @@ export default function AdminPage() {
               ))}
               {slides.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}>
-                  <p>Nenhum slide. Clique em "+ Novo slide" para começar.</p>
+                  <p>Nenhum slide. Clique em "+ Novo slide" para comeÃ§ar.</p>
                 </div>
               )}
             </div>
@@ -422,3 +422,4 @@ export default function AdminPage() {
     </div>
   )
 }
+
