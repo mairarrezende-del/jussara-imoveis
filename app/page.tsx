@@ -32,7 +32,7 @@ type Slide = {
 
 const TIPO_LABEL: Record<string, string> = {
   casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno',
-  comercial: 'Comercial', chacara: 'ChâÃ­cara / SâÂ¡tio', fazenda: 'Fazenda'
+  comercial: 'Comercial', chacara: 'Chácara / Sítio', fazenda: 'Fazenda'
 }
 
 const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
@@ -94,7 +94,7 @@ export default function Home() {
     const email = (f.querySelector('#f-email') as HTMLInputElement).value
     const interesse = (f.querySelector('#f-int') as HTMLSelectElement).value
     const msg = (f.querySelector('#f-msg') as HTMLTextAreaElement).value
-    const txt = encodeURIComponent(`OlâÃ­, Jussara! Â­ÆÃ¦Ã¯\n\nMeu nome âÂ® *${nome}*.\nÂ­ÆÃ´â ${tel}\nÂ­ÆÃ´Âº ${email}\nÂ­ÆÃÃ¡ ${interesse}\n\n${msg}`)
+    const txt = encodeURIComponent(`OlâÃ­, Jussara! Â­ÆÃ¦Ã¯\n\nMeu nome é *${nome}*.\nÂ­ÆÃ´â ${tel}\nÂ­ÆÃ´Âº ${email}\nÂ­ÆÃÃ¡ ${interesse}\n\n${msg}`)
     window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
   }
 
@@ -102,7 +102,7 @@ export default function Home() {
     e.preventDefault()
     const f = e.currentTarget
     const get = (id: string) => (f.querySelector(`#${id}`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)?.value || ''
-    const txt = encodeURIComponent(`OlâÃ­, Jussara! Tenho um imââvel para vender. Â­ÆÃÃ¡\n\nÂ­ÆÃ¦Ã± *${get('cap-nome')}*\nÂ­ÆÃ´â ${get('cap-tel')}\n\nÂ­ÆÃ´Ã¯ *Dados:*\nÃÃÃ³ Tipo: ${get('cap-tipo')}\nÃÃÃ³ Zona: ${get('cap-zona')}\nÃÃÃ³ Cidade: ${get('cap-cidade')}\nÃÃÃ³ Bairro: ${get('cap-bairro')}\nÃÃÃ³ âÃ¼rea: ${get('cap-area')} mâ¬â\nÃÃÃ³ Valor: R$ ${get('cap-valor')}\n\nÂ­ÆÃ´Ã ${get('cap-desc')}`)
+    const txt = encodeURIComponent(`OlâÃ­, Jussara! Tenho um imóvel para vender. Â­ÆÃÃ¡\n\nÂ­ÆÃ¦Ã± *${get('cap-nome')}*\nÂ­ÆÃ´â ${get('cap-tel')}\n\nÂ­ÆÃ´Ã¯ *Dados:*\nÃÃÃ³ Tipo: ${get('cap-tipo')}\nÃÃÃ³ Zona: ${get('cap-zona')}\nÃÃÃ³ Cidade: ${get('cap-cidade')}\nÃÃÃ³ Bairro: ${get('cap-bairro')}\nÃÃÃ³ âÃ¼rea: ${get('cap-area')} mâ¬â\nÃÃÃ³ Valor: R$ ${get('cap-valor')}\n\nÂ­ÆÃ´Ã ${get('cap-desc')}`)
     window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
   }
 
@@ -132,7 +132,7 @@ export default function Home() {
           {lbImovel.fotos && lbImovel.fotos.length > 0 ? (
             <img src={lbImovel.fotos[lbFotoIdx]} alt={lbImovel.titulo} style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 2 }} onClick={e => e.stopPropagation()} />
           ) : (
-            <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponâÂ¡vel</div>
+            <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponável</div>
           )}
           {lbImovel.fotos && lbImovel.fotos.length > 1 && (
             <>
@@ -308,12 +308,12 @@ export default function Home() {
           </span>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>Jussara Ribeiro</h2>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300 }}>
-            Sou corretora imobiliâÃ­ria com mais de 15 anos de atuaâÂºâÃºo em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
+            Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
           </p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300 }}>
-            Meu trabalho âÂ® construâÂ¡do sobre dois pilares: transparência e confiança. Cada negociaâÂºâÃºo âÂ® tratada com mâÃ­xima atenâÂºâÃºo e responsabilidade.
+            Meu trabalho é construádo sobre dois pilares: transparência e confiança. Cada negociação é tratada com mâÃ­xima atenção e responsabilidade.
           </p>
-          {['Especialista em imóveis residenciais e comerciais', 'AtuaâÂºâÃºo em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurâÂ¡dica', 'AvaliaâÂºâÃºo gratuita do seu imââvel'].map(item => (
+          {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurádica', 'Avaliação gratuita do seu imóvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
             </div>
@@ -335,7 +335,7 @@ export default function Home() {
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
               Portfólio <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
             </span>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponâÂ¡veis</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponáveis</h2>
           </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[['', 'Todos'], ['casa', 'Casas'], ['apartamento', 'Apartamentos'], ['lote', 'Lotes'], ['rural', 'Rural']].map(([v, l]) => (
@@ -346,7 +346,7 @@ export default function Home() {
 
         {imoveisFiltrados.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: s.cinza, border: `1.5px dashed rgba(4,49,55,0.1)`, borderRadius: 2 }}>
-            <p style={{ fontSize: '0.85rem' }}>Nenhum imââvel encontrado. Adicione imóveis pelo painel admin.</p>
+            <p style={{ fontSize: '0.85rem' }}>Nenhum imóvel encontrado. Adicione imóveis pelo painel admin.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '1.6rem' }}>
@@ -395,15 +395,15 @@ export default function Home() {
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Fale comigo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro, opacity: 0.5 }} />
           </span>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>Vamos encontrar<br />o imââvel ideal?</h2>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>Vamos encontrar<br />o imóvel ideal?</h2>
           <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem' }}>
-            Entre em contato para agendar uma visita ou solicitar avaliaâÂºâÃºo gratuita.
+            Entre em contato para agendar uma visita ou solicitar avaliação gratuita.
           </p>
           {[
             { icon: 'Â­ÆÃ´â', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
             { icon: 'Â­ÆÃ´Â©', label: 'Instagram', value: '@jussara_ribeirocorretora', href: 'https://www.instagram.com/jussara_ribeirocorretora/' },
             { icon: 'Â­ÆÃ´Ã¿', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: 'https://www.facebook.com/jussararibeirocorretora' },
-            { icon: 'Â­ÆÃ´Ã¬', label: 'LocalizaâÂºâÃºo', value: 'Campo Belo ÃÃÃ¶ MG e região', href: undefined },
+            { icon: 'Â­ÆÃ´Ã¬', label: 'Localização', value: 'Campo Belo ÃÃÃ¶ MG e região', href: undefined },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', marginBottom: '1.35rem' }}>
               <div style={{ width: 42, height: 42, flexShrink: 0, border: `1px solid rgba(223,192,120,0.28)`, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1, fontSize: '1rem' }}>{item.icon}</div>
@@ -420,7 +420,7 @@ export default function Home() {
         </div>
         <div>
           <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid rgba(223,192,120,0.18)` }}>
-            {['Fale comigo', 'Quero vender meu imââvel'].map((label, i) => (
+            {['Fale comigo', 'Quero vender meu imóvel'].map((label, i) => (
               <button key={label} id={`tab-${i}`} onClick={() => {
                 document.getElementById('cp-0')!.style.display = i === 0 ? 'block' : 'none'
                 document.getElementById('cp-1')!.style.display = i === 1 ? 'block' : 'none'
@@ -448,9 +448,9 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label>
                 <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }}>
-                  <option>Comprar imââvel</option>
-                  <option>Vender imââvel</option>
-                  <option>AvaliaâÂºâÃºo de imââvel</option>
+                  <option>Comprar imóvel</option>
+                  <option>Vender imóvel</option>
+                  <option>Avaliação de imóvel</option>
                   <option>Outro</option>
                 </select>
               </div>
@@ -465,7 +465,7 @@ export default function Home() {
           </div>
 
           <div id="cp-1" style={{ paddingTop: '1.4rem', display: 'none' }}>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imââvel âÃ¡ venda? Preencha o formulâÃ­rio e Jussara entrarâÃ­ em contato.</p>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imóvel âÃ¡ venda? Preencha o formulâÃ­rio e Jussara entrarâÃ­ em contato.</p>
             <form onSubmit={enviarCaptacao} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                 {[{ id: 'cap-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'cap-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
@@ -477,7 +477,7 @@ export default function Home() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo do imââvel</label>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo do imóvel</label>
                   <select id="cap-tipo" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
                     {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
@@ -499,7 +499,7 @@ export default function Home() {
                 ))}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>DescriâÂºâÃºo</label>
+                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label>
                 <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem, diferenciais..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
