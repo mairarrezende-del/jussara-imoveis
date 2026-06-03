@@ -1,13 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Jussara Ribeiro | Corretora Imobiliária — Campo Belo, MG',
-  description: 'Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado com a corretora Jussara Ribeiro. CRECI-MG 52583.',
-  keywords: 'imóveis Campo Belo, corretora Campo Belo, casas à venda Campo Belo, terrenos Campo Belo, Jussara Ribeiro corretora',
+  title: 'Jussara Ribeiro | Corretora Imobiliária',
+  description: 'Compra e venda de imóveis em Campo Belo e região.',
   openGraph: {
     title: 'Jussara Ribeiro | Corretora Imobiliária',
     description: 'Compra e venda de imóveis em Campo Belo e região.',
@@ -24,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        <meta charSet="utf-8" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
