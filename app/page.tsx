@@ -142,7 +142,7 @@ export default function Home() {
           )}
           <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.branco, fontSize: '1rem' }}>{lbImovel.titulo}</p>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.endereco} — {lbImovel.cidade}</p>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.bairro} — {lbImovel.cidade}</p>
             {lbImovel.fotos && <p style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.5)', marginTop: '0.3rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{lbFotoIdx + 1} de {lbImovel.fotos.length}</p>}
           </div>
         </div>
