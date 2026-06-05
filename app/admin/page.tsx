@@ -40,8 +40,7 @@ const FONTES_TITULO = ['Cormorant Garamond', 'Playfair Display', 'Merriweather',
 const FONTES_TEXTO = ['Open Sans', 'Lato', 'Roboto', 'Montserrat', 'Raleway']
 
 const s = {
-  verde: '#043137', verdeM: '#065460', ouro: '#DFC078',
-  branco: '#FFFFFF', off: '#F8F6F2', cinza: '#7A7A7A',
+  verde: '#043137', ouro: '#DFC078', branco: '#FFFFFF',
   borda: 'rgba(223,192,120,0.22)'
 }
 
@@ -51,24 +50,81 @@ const imovelVazio: Imovel = {
   banheiros: 0, vagas: 0, fotos: [], video_url: '', slug: '', destaque: false, status: 'disponivel'
 }
 
-const SENHA_PADRAO = 'jussara2025'
+const GRUPOS_TEXTO = [
+  {
+    grupo: '🏠 Navegação',
+    campos: [
+      { chave: 'nav_nome', label: 'Nome no menu' },
+      { chave: 'nav_subtitulo', label: 'Subtítulo no menu' },
+    ]
+  },
+  {
+    grupo: '🌟 Seção Principal (Hero)',
+    campos: [
+      { chave: 'hero_tag', label: 'Tag acima do título' },
+      { chave: 'hero_titulo', label: 'Título principal', grande: true },
+      { chave: 'hero_subtitulo', label: 'Subtítulo / descrição', grande: true },
+      { chave: 'hero_stat1_num', label: 'Estatística 1 — número' },
+      { chave: 'hero_stat1_label', label: 'Estatística 1 — label' },
+      { chave: 'hero_stat2_num', label: 'Estatística 2 — número' },
+      { chave: 'hero_stat2_label', label: 'Estatística 2 — label' },
+      { chave: 'hero_stat3_num', label: 'Estatística 3 — número' },
+      { chave: 'hero_stat3_label', label: 'Estatística 3 — label' },
+    ]
+  },
+  {
+    grupo: '👤 Seção Sobre',
+    campos: [
+      { chave: 'sobre_titulo', label: 'Nome da corretora' },
+      { chave: 'sobre_anos', label: 'Anos de experiência (destaque)' },
+      { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true },
+      { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true },
+    ]
+  },
+  {
+    grupo: '⚖️ Seção Jurídico',
+    campos: [
+      { chave: 'juridico_titulo', label: 'Título da seção' },
+      { chave: 'juridico_subtitulo', label: 'Subtítulo', grande: true },
+      { chave: 'juridico_advogada', label: 'Nome da advogada' },
+      { chave: 'juridico_oab', label: 'Descrição / OAB' },
+    ]
+  },
+  {
+    grupo: '📬 Seção Contato',
+    campos: [
+      { chave: 'contato_titulo', label: 'Título' },
+      { chave: 'contato_subtitulo', label: 'Subtítulo', grande: true },
+      { chave: 'localizacao', label: 'Localização' },
+    ]
+  },
+  {
+    grupo: '📱 Redes Sociais',
+    campos: [
+      { chave: 'whatsapp', label: 'WhatsApp (só números, com DDI)' },
+      { chave: 'instagram', label: 'Instagram (só o @, sem @)' },
+      { chave: 'facebook', label: 'Facebook (URL completa)' },
+    ]
+  },
+  {
+    grupo: '📄 Rodapé',
+    campos: [
+      { chave: 'footer_texto', label: 'Texto do rodapé' },
+      { chave: 'footer_creci', label: 'CRECI / registros' },
+    ]
+  },
+]
 
 export default function AdminPage() {
   const [autenticado, setAutenticado] = useState(false)
   const [senhaInput, setSenhaInput] = useState('')
   const [erroSenha, setErroSenha] = useState(false)
-  const [senhaAdmin, setSenhaAdmin] = useState(SENHA_PADRAO)
+  const [senhaAdmin, setSenhaAdmin] = useState('jussara2025')
 
   const [aba, setAba] = useState('imoveis')
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
-  const [config, setConfig] = useState<Config>({
-    cor_principal: '#043137',
-    cor_destaque: '#DFC078',
-    fonte_titulo: 'Cormorant Garamond',
-    fonte_texto: 'Open Sans',
-    senha_admin: SENHA_PADRAO,
-  })
+  const [config, setConfig] = useState<Config>({})
   const [editando, setEditando] = useState<Imovel | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [msg, setMsg] = useState('')
@@ -84,7 +140,7 @@ export default function AdminPage() {
     if (data) {
       const cfg: Config = {}
       data.forEach((row: { chave: string; valor: string }) => { cfg[row.chave] = row.valor })
-      setConfig(prev => ({ ...prev, ...cfg }))
+      setConfig(cfg)
       if (cfg.senha_admin) setSenhaAdmin(cfg.senha_admin)
     }
   }
@@ -173,8 +229,8 @@ export default function AdminPage() {
       await supabase.from('configuracoes').upsert({ chave, valor }, { onConflict: 'chave' })
     }
     setSalvando(false)
-    setMsg('✅ Configurações salvas!')
-    setTimeout(() => setMsg(''), 3000)
+    setMsg('✅ Configurações salvas! Recarregue o site para ver as mudanças.')
+    setTimeout(() => setMsg(''), 4000)
   }
 
   async function uploadFoto(file: File, tipo: 'imovel' | 'carrossel'): Promise<string> {
@@ -217,7 +273,6 @@ export default function AdminPage() {
   const lbl = { fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.45)', display: 'block', marginBottom: '0.35rem' }
   const campo = { display: 'flex', flexDirection: 'column' as const, gap: '0.35rem', marginBottom: '1rem' }
 
-  // TELA DE LOGIN
   if (!autenticado) {
     return (
       <div style={{ minHeight: '100vh', background: s.verde, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Open Sans, sans-serif' }}>
@@ -227,19 +282,10 @@ export default function AdminPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', textAlign: 'left' }}>
               <label style={lbl}>Senha de acesso</label>
-              <input
-                type="password"
-                placeholder="Digite a senha..."
-                value={senhaInput}
-                onChange={e => setSenhaInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && entrar()}
-                style={{ ...inp(), border: erroSenha ? '1px solid rgba(200,50,50,0.6)' : `1px solid rgba(223,192,120,0.2)` }}
-              />
+              <input type="password" placeholder="Digite a senha..." value={senhaInput} onChange={e => setSenhaInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && entrar()} style={{ ...inp(), border: erroSenha ? '1px solid rgba(200,50,50,0.6)' : `1px solid rgba(223,192,120,0.2)` }} />
               {erroSenha && <p style={{ fontSize: '0.72rem', color: '#ff8080', marginTop: '0.25rem' }}>Senha incorreta. Tente novamente.</p>}
             </div>
-            <button onClick={entrar} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>
-              Entrar
-            </button>
+            <button onClick={entrar} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>Entrar</button>
           </div>
         </div>
       </div>
@@ -270,7 +316,7 @@ export default function AdminPage() {
 
       {/* ABAS */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw', overflowX: 'auto' }}>
-        {[['imoveis', '🏡 Imóveis'], ['carrossel', '🖼️ Carrossel'], ['novo', '+ Novo Imóvel'], ['configuracoes', '⚙️ Configurações']].map(([v, l]) => (
+        {[['imoveis', '🏡 Imóveis'], ['carrossel', '🖼️ Carrossel'], ['novo', '+ Novo Imóvel'], ['textos', '✏️ Textos'], ['configuracoes', '⚙️ Visual']].map(([v, l]) => (
           <button key={v} onClick={() => { setAba(v); if (v === 'novo') setEditando({ ...imovelVazio }) }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>
             {l}
           </button>
@@ -327,76 +373,29 @@ export default function AdminPage() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
               <div>
-                <div style={campo}>
-                  <label style={lbl}>Título *</label>
-                  <input style={inp()} value={editando.titulo} onChange={e => setEditando({ ...editando, titulo: e.target.value, slug: gerarSlug(e.target.value) })} placeholder="Ex: Casa residencial 3 quartos" />
-                </div>
-                <div style={campo}>
-                  <label style={lbl}>Descrição</label>
-                  <textarea style={{ ...inp(), minHeight: 100, resize: 'vertical' }} value={editando.descricao} onChange={e => setEditando({ ...editando, descricao: e.target.value })} placeholder="Descreva o imóvel..." />
-                </div>
+                <div style={campo}><label style={lbl}>Título *</label><input style={inp()} value={editando.titulo} onChange={e => setEditando({ ...editando, titulo: e.target.value, slug: gerarSlug(e.target.value) })} placeholder="Ex: Casa residencial 3 quartos" /></div>
+                <div style={campo}><label style={lbl}>Descrição</label><textarea style={{ ...inp(), minHeight: 100, resize: 'vertical' }} value={editando.descricao} onChange={e => setEditando({ ...editando, descricao: e.target.value })} placeholder="Descreva o imóvel..." /></div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div style={campo}>
-                    <label style={lbl}>Tipo</label>
-                    <select style={{ ...inp(), background: s.verde }} value={editando.tipo} onChange={e => setEditando({ ...editando, tipo: e.target.value })}>
-                      {Object.entries(TIPOS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                    </select>
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Zona</label>
-                    <select style={{ ...inp(), background: s.verde }} value={editando.zona} onChange={e => setEditando({ ...editando, zona: e.target.value })}>
-                      <option value="urbano">Urbano</option>
-                      <option value="rural">Rural</option>
-                    </select>
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Cidade</label>
-                    <select style={{ ...inp(), background: s.verde }} value={editando.cidade} onChange={e => setEditando({ ...editando, cidade: e.target.value })}>
-                      {CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Bairro</label>
-                    <input style={inp()} value={editando.bairro} onChange={e => setEditando({ ...editando, bairro: e.target.value })} placeholder="Ex: Centro" />
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Preço (R$)</label>
-                    <input style={inp()} type="number" value={editando.preco || ''} onChange={e => setEditando({ ...editando, preco: Number(e.target.value) })} placeholder="Ex: 380000" />
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Área (m²)</label>
-                    <input style={inp()} type="number" value={editando.area || ''} onChange={e => setEditando({ ...editando, area: Number(e.target.value) })} placeholder="Ex: 120" />
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Quartos</label>
-                    <input style={inp()} type="number" value={editando.quartos || ''} onChange={e => setEditando({ ...editando, quartos: Number(e.target.value) })} placeholder="Ex: 3" />
-                  </div>
-                  <div style={campo}>
-                    <label style={lbl}>Banheiros</label>
-                    <input style={inp()} type="number" value={editando.banheiros || ''} onChange={e => setEditando({ ...editando, banheiros: Number(e.target.value) })} placeholder="Ex: 2" />
-                  </div>
+                  <div style={campo}><label style={lbl}>Tipo</label><select style={{ ...inp(), background: s.verde }} value={editando.tipo} onChange={e => setEditando({ ...editando, tipo: e.target.value })}>{Object.entries(TIPOS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></div>
+                  <div style={campo}><label style={lbl}>Zona</label><select style={{ ...inp(), background: s.verde }} value={editando.zona} onChange={e => setEditando({ ...editando, zona: e.target.value })}><option value="urbano">Urbano</option><option value="rural">Rural</option></select></div>
+                  <div style={campo}><label style={lbl}>Cidade</label><select style={{ ...inp(), background: s.verde }} value={editando.cidade} onChange={e => setEditando({ ...editando, cidade: e.target.value })}>{CIDADES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                  <div style={campo}><label style={lbl}>Bairro</label><input style={inp()} value={editando.bairro} onChange={e => setEditando({ ...editando, bairro: e.target.value })} placeholder="Ex: Centro" /></div>
+                  <div style={campo}><label style={lbl}>Preço (R$)</label><input style={inp()} type="number" value={editando.preco || ''} onChange={e => setEditando({ ...editando, preco: Number(e.target.value) })} placeholder="Ex: 380000" /></div>
+                  <div style={campo}><label style={lbl}>Área (m²)</label><input style={inp()} type="number" value={editando.area || ''} onChange={e => setEditando({ ...editando, area: Number(e.target.value) })} placeholder="Ex: 120" /></div>
+                  <div style={campo}><label style={lbl}>Quartos</label><input style={inp()} type="number" value={editando.quartos || ''} onChange={e => setEditando({ ...editando, quartos: Number(e.target.value) })} placeholder="Ex: 3" /></div>
+                  <div style={campo}><label style={lbl}>Banheiros</label><input style={inp()} type="number" value={editando.banheiros || ''} onChange={e => setEditando({ ...editando, banheiros: Number(e.target.value) })} placeholder="Ex: 2" /></div>
                 </div>
-                <div style={campo}>
-                  <label style={lbl}>Link do vídeo (YouTube ou Instagram)</label>
-                  <input style={inp()} value={editando.video_url} onChange={e => setEditando({ ...editando, video_url: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." />
-                </div>
-                <div style={campo}>
-                  <label style={lbl}>Status</label>
-                  <select style={{ ...inp(), background: s.verde }} value={editando.status} onChange={e => setEditando({ ...editando, status: e.target.value })}>
-                    <option value="disponivel">Disponível</option>
-                    <option value="reservado">Reservado</option>
-                    <option value="vendido">Vendido</option>
-                  </select>
-                </div>
+                <div style={campo}><label style={lbl}>Link do vídeo</label><input style={inp()} value={editando.video_url} onChange={e => setEditando({ ...editando, video_url: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." /></div>
+                <div style={campo}><label style={lbl}>Status</label><select style={{ ...inp(), background: s.verde }} value={editando.status} onChange={e => setEditando({ ...editando, status: e.target.value })}><option value="disponivel">Disponível</option><option value="reservado">Reservado</option><option value="vendido">Vendido</option></select></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                   <input type="checkbox" id="destaque" checked={editando.destaque} onChange={e => setEditando({ ...editando, destaque: e.target.checked })} />
-                  <label htmlFor="destaque" style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Destacar este imóvel na página inicial</label>
+                  <label htmlFor="destaque" style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Destacar na página inicial</label>
                 </div>
               </div>
               <div>
                 <div style={campo}>
                   <label style={lbl}>Fotos do imóvel</label>
-                  <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', position: 'relative' }}>
+                  <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative' }}>
                     <input type="file" multiple accept="image/*" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                     <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>📸 Clique para adicionar fotos</p>
                     <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP • Múltiplas fotos permitidas</p>
@@ -412,8 +411,8 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid rgba(223,192,120,0.1)`, borderRadius: 2, padding: '1rem', marginBottom: '1rem' }}>
-                  <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>URL amigável (slug)</p>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid rgba(223,192,120,0.1)`, borderRadius: 2, padding: '1rem' }}>
+                  <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>URL amigável</p>
                   <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', wordBreak: 'break-all' }}>/imoveis/{editando.slug || gerarSlug(editando.titulo) || 'sera-gerado-automaticamente'}</p>
                 </div>
               </div>
@@ -422,9 +421,7 @@ export default function AdminPage() {
               <button onClick={salvarImovel} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
                 {salvando ? 'Salvando...' : '💾 Salvar imóvel'}
               </button>
-              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.45)', padding: '0.9rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', cursor: 'pointer', borderRadius: 1 }}>
-                Cancelar
-              </button>
+              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.45)', padding: '0.9rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', cursor: 'pointer', borderRadius: 1 }}>Cancelar</button>
             </div>
           </div>
         )}
@@ -442,27 +439,15 @@ export default function AdminPage() {
                 <div key={sl.id || idx} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.25rem' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr auto', gap: '1.5rem', alignItems: 'start' }}>
                     <div>
-                      {sl.imagem ? (
-                        <img src={sl.imagem} alt={sl.legenda} style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: 100, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '0.5rem' }}>🖼️</div>
-                      )}
+                      {sl.imagem ? <img src={sl.imagem} alt={sl.legenda} style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} /> : <div style={{ width: '100%', height: 100, background: 'rgba(255,255,255,0.05)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '0.5rem' }}>🖼️</div>}
                       <div style={{ position: 'relative' }}>
                         <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleFotoSlide(e.target.files[0], sl, idx)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
-                        <button style={{ width: '100%', background: 'transparent', border: `1px solid rgba(223,192,120,0.25)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem', borderRadius: 1, fontSize: '0.65rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                          {sl.imagem ? 'Trocar imagem' : 'Adicionar imagem'}
-                        </button>
+                        <button style={{ width: '100%', background: 'transparent', border: `1px solid rgba(223,192,120,0.25)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem', borderRadius: 1, fontSize: '0.65rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{sl.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
                       </div>
                     </div>
                     <div>
-                      <div style={campo}>
-                        <label style={lbl}>Legenda principal</label>
-                        <input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: Imóveis exclusivos em Campo Belo" />
-                      </div>
-                      <div style={campo}>
-                        <label style={lbl}>Subtítulo</label>
-                        <input style={inp()} value={sl.subtitulo} onChange={e => { const n = [...slides]; n[idx] = { ...sl, subtitulo: e.target.value }; setSlides(n) }} placeholder="Ex: Compra e venda com quem entende" />
-                      </div>
+                      <div style={campo}><label style={lbl}>Legenda principal</label><input style={inp()} value={sl.legenda} onChange={e => { const n = [...slides]; n[idx] = { ...sl, legenda: e.target.value }; setSlides(n) }} placeholder="Ex: Imóveis exclusivos em Campo Belo" /></div>
+                      <div style={campo}><label style={lbl}>Subtítulo</label><input style={inp()} value={sl.subtitulo} onChange={e => { const n = [...slides]; n[idx] = { ...sl, subtitulo: e.target.value }; setSlides(n) }} placeholder="Ex: Compra e venda com quem entende" /></div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <input type="checkbox" id={`ativo-${idx}`} checked={sl.ativo} onChange={e => { const n = [...slides]; n[idx] = { ...sl, ativo: e.target.checked }; setSlides(n) }} />
                         <label htmlFor={`ativo-${idx}`} style={{ ...lbl, margin: 0, cursor: 'pointer' }}>Slide ativo</label>
@@ -475,73 +460,104 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
-              {slides.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}>
-                  <p>Nenhum slide. Clique em "+ Novo slide" para começar.</p>
-                </div>
-              )}
+              {slides.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}><p>Nenhum slide. Clique em "+ Novo slide" para começar.</p></div>}
             </div>
           </div>
         )}
 
-        {/* ABA CONFIGURAÇÕES */}
+        {/* ABA TEXTOS */}
+        {aba === 'textos' && (
+          <div style={{ maxWidth: 800 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>✏️ Editar textos do site</h2>
+              <button onClick={salvarConfig} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.7rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
+                {salvando ? 'Salvando...' : '💾 Salvar todos os textos'}
+              </button>
+            </div>
+            {GRUPOS_TEXTO.map(grupo => (
+              <div key={grupo.grupo} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.25rem' }}>
+                <p style={{ fontSize: '0.78rem', color: s.ouro, fontWeight: 600, marginBottom: '1.25rem', letterSpacing: '0.05em' }}>{grupo.grupo}</p>
+                {grupo.campos.map(f => (
+                  <div key={f.chave} style={campo}>
+                    <label style={lbl}>{f.label}</label>
+                    {(f as any).grande ? (
+                      <textarea
+                        value={config[f.chave] || ''}
+                        onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))}
+                        rows={3}
+                        style={{ ...inp(), resize: 'vertical', minHeight: 80 }}
+                      />
+                    ) : (
+                      <input
+                        value={config[f.chave] || ''}
+                        onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))}
+                        style={inp()}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+            <button onClick={salvarConfig} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
+              {salvando ? 'Salvando...' : '💾 Salvar todos os textos'}
+            </button>
+          </div>
+        )}
+
+        {/* ABA VISUAL */}
         {aba === 'configuracoes' && (
           <div style={{ maxWidth: 700 }}>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400, marginBottom: '2rem' }}>⚙️ Configurações visuais</h2>
-
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🎨 Cores</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 <div style={campo}>
                   <label style={lbl}>Cor principal (fundo)</label>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                    <input type="color" value={config.cor_principal} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
-                    <input style={{ ...inp(), flex: 1 }} value={config.cor_principal} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} placeholder="#043137" />
+                    <input type="color" value={config.cor_principal || '#043137'} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
+                    <input style={{ ...inp(), flex: 1 }} value={config.cor_principal || '#043137'} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} placeholder="#043137" />
                   </div>
                 </div>
                 <div style={campo}>
                   <label style={lbl}>Cor de destaque (ouro)</label>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                    <input type="color" value={config.cor_destaque} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
-                    <input style={{ ...inp(), flex: 1 }} value={config.cor_destaque} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} placeholder="#DFC078" />
+                    <input type="color" value={config.cor_destaque || '#DFC078'} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
+                    <input style={{ ...inp(), flex: 1 }} value={config.cor_destaque || '#DFC078'} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} placeholder="#DFC078" />
                   </div>
                 </div>
               </div>
-              <div style={{ marginTop: '1rem', padding: '1rem', borderRadius: 1, display: 'flex', alignItems: 'center', gap: '1rem', background: config.cor_principal }}>
-                <span style={{ fontFamily: config.fonte_titulo + ', serif', fontSize: '1.1rem', color: config.cor_destaque }}>Jussara Ribeiro Imóveis</span>
-                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)' }}>← Prévia das cores</span>
+              <div style={{ marginTop: '1rem', padding: '1rem', borderRadius: 1, display: 'flex', alignItems: 'center', gap: '1rem', background: config.cor_principal || '#043137' }}>
+                <span style={{ fontFamily: (config.fonte_titulo || 'Cormorant Garamond') + ', serif', fontSize: '1.1rem', color: config.cor_destaque || '#DFC078' }}>Jussara Ribeiro Imóveis</span>
+                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)' }}>← Prévia</span>
               </div>
             </div>
-
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔤 Fontes</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 <div style={campo}>
                   <label style={lbl}>Fonte dos títulos</label>
-                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_titulo} onChange={e => setConfig(c => ({ ...c, fonte_titulo: e.target.value }))}>
+                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_titulo || 'Cormorant Garamond'} onChange={e => setConfig(c => ({ ...c, fonte_titulo: e.target.value }))}>
                     {FONTES_TITULO.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
-                  <p style={{ fontFamily: config.fonte_titulo + ', serif', fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Jussara Ribeiro</p>
+                  <p style={{ fontFamily: (config.fonte_titulo || 'Cormorant Garamond') + ', serif', fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Jussara Ribeiro</p>
                 </div>
                 <div style={campo}>
                   <label style={lbl}>Fonte do texto geral</label>
-                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_texto} onChange={e => setConfig(c => ({ ...c, fonte_texto: e.target.value }))}>
+                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_texto || 'Open Sans'} onChange={e => setConfig(c => ({ ...c, fonte_texto: e.target.value }))}>
                     {FONTES_TEXTO.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
-                  <p style={{ fontFamily: config.fonte_texto + ', sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Compra e venda de imóveis</p>
+                  <p style={{ fontFamily: (config.fonte_texto || 'Open Sans') + ', sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Compra e venda de imóveis</p>
                 </div>
               </div>
             </div>
-
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔒 Segurança</p>
               <div style={campo}>
                 <label style={lbl}>Senha do painel admin</label>
-                <input style={inp()} type="text" value={config.senha_admin} onChange={e => setConfig(c => ({ ...c, senha_admin: e.target.value }))} placeholder="Nova senha..." />
-                <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginTop: '0.35rem' }}>Anote a senha antes de salvar. Ela será exigida no próximo acesso.</p>
+                <input style={inp()} type="text" value={config.senha_admin || ''} onChange={e => setConfig(c => ({ ...c, senha_admin: e.target.value }))} placeholder="Nova senha..." />
+                <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginTop: '0.35rem' }}>Anote a senha antes de salvar.</p>
               </div>
             </div>
-
             <button onClick={salvarConfig} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
               {salvando ? 'Salvando...' : '💾 Salvar configurações'}
             </button>
