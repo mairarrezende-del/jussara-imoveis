@@ -30,6 +30,8 @@ type Slide = {
   ordem: number
 }
 
+type Config = Record<string, string>
+
 const TIPO_LABEL: Record<string, string> = {
   casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno',
   comercial: 'Comercial', chacara: 'Chácara / Sítio', fazenda: 'Fazenda'
@@ -37,9 +39,18 @@ const TIPO_LABEL: Record<string, string> = {
 
 const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
 
+const FONTES_TITULO = ['Cormorant Garamond', 'Playfair Display', 'Merriweather', 'Lora', 'Georgia']
+const FONTES_TEXTO = ['Open Sans', 'Lato', 'Roboto', 'Montserrat', 'Raleway']
+
 export default function Home() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
+  const [config, setConfig] = useState<Config>({
+    cor_principal: '#043137',
+    cor_destaque: '#DFC078',
+    fonte_titulo: 'Cormorant Garamond',
+    fonte_texto: 'Open Sans',
+  })
   const [filtro, setFiltro] = useState('')
   const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', vmin: '', vmax: '' })
   const [carIdx, setCarIdx] = useState(0)
@@ -52,6 +63,7 @@ export default function Home() {
   useEffect(() => {
     fetchImoveis()
     fetchSlides()
+    fetchConfig()
   }, [])
 
   useEffect(() => {
@@ -68,6 +80,15 @@ export default function Home() {
   async function fetchSlides() {
     const { data } = await supabase.from('carrossel').select('*').eq('ativo', true).order('ordem')
     if (data) setSlides(data)
+  }
+
+  async function fetchConfig() {
+    const { data } = await supabase.from('configuracoes').select('*')
+    if (data) {
+      const cfg: Config = {}
+      data.forEach((row: { chave: string; valor: string }) => { cfg[row.chave] = row.valor })
+      setConfig(prev => ({ ...prev, ...cfg }))
+    }
   }
 
   function carNav(dir: number) {
@@ -106,6 +127,17 @@ export default function Home() {
     window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
   }
 
+  function enviarJuridico(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const f = e.currentTarget
+    const nome = (f.querySelector('#j-nome') as HTMLInputElement).value
+    const tel = (f.querySelector('#j-tel') as HTMLInputElement).value
+    const servico = (f.querySelector('#j-servico') as HTMLSelectElement).value
+    const msg = (f.querySelector('#j-msg') as HTMLTextAreaElement).value
+    const txt = encodeURIComponent(`Olá! Preciso de assessoria jurídica imobiliária. ⚖️\n\n👤 *${nome}*\n📞 ${tel}\n\n📋 Serviço: *${servico}*\n\n📝 ${msg}`)
+    window.open(`https://wa.me/${WPP}?text=${txt}`, '_blank')
+  }
+
   const imoveisFiltrados = imoveis.filter(im => {
     if (filtro && im.tipo !== filtro && im.zona !== filtro) return false
     if (busca.texto && !`${im.titulo}${im.cidade}${im.bairro}`.toLowerCase().includes(busca.texto.toLowerCase())) return false
@@ -118,10 +150,26 @@ export default function Home() {
   })
 
   const s = {
-    verde: '#043137', verdeM: '#065460', ouro: '#DFC078', ouroC: '#EDD49A',
-    branco: '#FFFFFF', off: '#F8F6F2', cinza: '#7A7A7A',
-    borda: 'rgba(223,192,120,0.22)'
+    verde: config.cor_principal || '#043137',
+    verdeM: '#065460',
+    ouro: config.cor_destaque || '#DFC078',
+    ouroC: '#EDD49A',
+    branco: '#FFFFFF',
+    off: '#F8F6F2',
+    cinza: '#7A7A7A',
+    borda: `rgba(223,192,120,0.22)`,
+    ftitulo: config.fonte_titulo || 'Cormorant Garamond',
+    ftexto: config.fonte_texto || 'Open Sans',
   }
+
+  // Injetar fontes do Google dinamicamente
+  useEffect(() => {
+    const fontes = [s.ftitulo, s.ftexto].map(f => f.replace(/ /g, '+')).join('|')
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?family=${fontes}:wght@300;400;600&display=swap`
+    document.head.appendChild(link)
+  }, [s.ftitulo, s.ftexto])
 
   return (
     <>
@@ -141,7 +189,7 @@ export default function Home() {
             </>
           )}
           <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.branco, fontSize: '1rem' }}>{lbImovel.titulo}</p>
+            <p style={{ fontFamily: s.ftitulo + ', serif', color: s.branco, fontSize: '1rem' }}>{lbImovel.titulo}</p>
             <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.bairro} • {lbImovel.cidade}</p>
             {lbImovel.fotos && <p style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.5)', marginTop: '0.3rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{lbFotoIdx + 1} de {lbImovel.fotos.length}</p>}
           </div>
@@ -151,13 +199,13 @@ export default function Home() {
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: s.ouro, fontWeight: 600 }}>Jussara Ribeiro</span>
+          <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.3rem', color: s.ouro, fontWeight: 600 }}>Jussara Ribeiro</span>
           <span style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.6)', marginLeft: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Imóveis</span>
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          {['#inicio', '#sobre', '#imoveis', '#contato'].map((href, i) => (
+          {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
             <a key={href} href={href} style={{ fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
-              {['Início', 'Sobre', 'Imóveis', 'Contato'][i]}
+              {['Início', 'Sobre', 'Imóveis', 'Jurídico', 'Contato'][i]}
             </a>
           ))}
           <button onClick={() => document.getElementById('busca')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.6)', padding: '0.38rem 0.9rem', borderRadius: 1, fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
@@ -182,7 +230,7 @@ export default function Home() {
                   {sl.imagem && <img src={sl.imagem} alt={sl.legenda} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />}
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(4,49,55,0.1) 0%, rgba(4,49,55,0.6) 100%)' }} />
                   <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 3rem', background: 'linear-gradient(to top, rgba(4,49,55,0.8), transparent)' }}>
-                    <strong style={{ fontFamily: 'Cormorant Garamond, serif', color: s.branco, fontSize: '1.1rem', display: 'block' }}>{sl.legenda}</strong>
+                    <strong style={{ fontFamily: s.ftitulo + ', serif', color: s.branco, fontSize: '1.1rem', display: 'block' }}>{sl.legenda}</strong>
                     <span style={{ fontSize: '0.75rem', color: 'rgba(223,192,120,0.8)', marginTop: '0.2rem', display: 'block' }}>{sl.subtitulo}</span>
                   </div>
                 </div>
@@ -203,7 +251,7 @@ export default function Home() {
         )}
       </div>
 
-      <div style={{ width: '100%', height: 2, background: 'linear-gradient(90deg, transparent, #DFC078, transparent)' }} />
+      <div style={{ width: '100%', height: 2, background: `linear-gradient(90deg, transparent, ${s.ouro}, transparent)` }} />
 
       {/* HERO */}
       <section style={{ minHeight: '80vh', background: s.verde, display: 'grid', gridTemplateColumns: '55% 45%', position: 'relative', overflow: 'hidden' }}>
@@ -213,10 +261,10 @@ export default function Home() {
             <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
             Corretora Imobiliária • Campo Belo, MG
           </div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem' }}>
+          <h1 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem' }}>
             Realizando o sonho<br />de cada <em style={{ fontStyle: 'italic', color: s.ouro }}>família</em><br />com confiança
           </h1>
-          <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, maxWidth: 390, marginBottom: '2rem', fontWeight: 300 }}>
+          <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, maxWidth: 390, marginBottom: '2rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
             Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.
           </p>
           <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
@@ -226,7 +274,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: '2rem', marginTop: '3rem', paddingTop: '1.75rem', borderTop: `1px solid ${s.borda}`, flexWrap: 'wrap' }}>
             {[['+ 200', 'Negócios realizados'], ['15 +', 'Anos de experiência'], ['100%', 'Compromisso']].map(([n, l]) => (
               <div key={l}>
-                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: s.ouro, lineHeight: 1, display: 'block' }}>{n}</span>
+                <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '2rem', color: s.ouro, lineHeight: 1, display: 'block' }}>{n}</span>
                 <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', display: 'block', marginTop: '0.28rem' }}>{l}</span>
               </div>
             ))}
@@ -250,16 +298,12 @@ export default function Home() {
       {/* BUSCA */}
       <div id="busca" style={{ background: s.verde, padding: '2rem 5vw' }}>
         <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderRadius: 2, padding: '1.4rem 1.75rem' }}>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>🔍 Buscar imóveis</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
-            {[
-              { id: 'b-txt', label: 'Palavra-chave', placeholder: 'Ex: casa 3 quartos...', key: 'texto' },
-            ].map(f => (
-              <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-                <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                <input placeholder={f.placeholder} onChange={e => setBusca(b => ({ ...b, [f.key]: e.target.value }))} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
-              </div>
-            ))}
+          <p style={{ fontFamily: s.ftitulo + ', serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>🔍 Buscar imóveis</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Palavra-chave</label>
+              <input placeholder="Ex: casa 3 quartos..." onChange={e => setBusca(b => ({ ...b, texto: e.target.value }))} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
               <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Cidade</label>
               <select onChange={e => setBusca(b => ({ ...b, cidade: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
@@ -282,7 +326,7 @@ export default function Home() {
                 <option value="rural">Rural</option>
               </select>
             </div>
-            <button onClick={() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.4rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, height: 'fit-content' }}>
+            <button onClick={() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.4rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, height: 'fit-content' }}>
               Buscar
             </button>
           </div>
@@ -298,7 +342,7 @@ export default function Home() {
             <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Foto da corretora</p>
           </div>
           <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 2 }}>
-            <strong style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>15+</strong>
+            <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>15+</strong>
             <span style={{ fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Anos no mercado</span>
           </div>
         </div>
@@ -306,15 +350,15 @@ export default function Home() {
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Sobre mim <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
           </span>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>Jussara Ribeiro</h2>
-          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300 }}>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>Jussara Ribeiro</h2>
+          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
             Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
           </p>
-          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300 }}>
+          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
             Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.
           </p>
           {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
-            <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem' }}>
+            <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
             </div>
           ))}
@@ -335,15 +379,14 @@ export default function Home() {
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
               Portfólio <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
             </span>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponíveis</h2>
+            <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde }}>Imóveis disponíveis</h2>
           </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[['', 'Todos'], ['casa', 'Casas'], ['apartamento', 'Apartamentos'], ['lote', 'Lotes'], ['rural', 'Rural']].map(([v, l]) => (
-              <button key={v} onClick={() => setFiltro(v)} style={{ padding: '0.45rem 1.1rem', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', border: `1px solid ${filtro === v ? s.verde : 'rgba(4,49,55,0.18)'}`, background: filtro === v ? s.off : 'transparent', color: filtro === v ? s.verde : s.cinza, cursor: 'pointer', borderRadius: 1, fontFamily: 'Open Sans, sans-serif' }}>{l}</button>
+              <button key={v} onClick={() => setFiltro(v)} style={{ padding: '0.45rem 1.1rem', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', border: `1px solid ${filtro === v ? s.verde : 'rgba(4,49,55,0.18)'}`, background: filtro === v ? s.off : 'transparent', color: filtro === v ? s.verde : s.cinza, cursor: 'pointer', borderRadius: 1, fontFamily: s.ftexto + ', sans-serif' }}>{l}</button>
             ))}
           </div>
         </div>
-
         {imoveisFiltrados.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: s.cinza, border: `1.5px dashed rgba(4,49,55,0.1)`, borderRadius: 2 }}>
             <p style={{ fontSize: '0.85rem' }}>Nenhum imóvel encontrado. Adicione imóveis pelo painel admin.</p>
@@ -368,14 +411,14 @@ export default function Home() {
                       <span key={b} style={{ fontSize: '0.58rem', letterSpacing: '0.09em', textTransform: 'uppercase', padding: '0.18rem 0.55rem', borderRadius: 1, background: s.off, color: s.verde, border: `1px solid rgba(4,49,55,0.1)` }}>{b}</span>
                     ))}
                   </div>
-                  <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', fontWeight: 600, color: s.verde, marginBottom: '0.28rem', lineHeight: 1.3 }}>{im.titulo}</p>
+                  <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.05rem', fontWeight: 600, color: s.verde, marginBottom: '0.28rem', lineHeight: 1.3 }}>{im.titulo}</p>
                   <p style={{ fontSize: '0.72rem', color: s.cinza, marginBottom: '0.75rem' }}>{im.bairro}{im.bairro ? ', ' : ''}{im.cidade}</p>
                   <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '0.9rem', flexWrap: 'wrap' }}>
                     {im.quartos > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>🛏 {im.quartos} quartos</span>}
                     {im.area > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>📐 {im.area} m²</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid rgba(4,49,55,0.07)`, paddingTop: '0.9rem' }}>
-                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
+                    <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
                       {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}
                     </p>
                     <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Ver detalhes →</Link>
@@ -389,14 +432,53 @@ export default function Home() {
 
       <div className="divisor" />
 
+      {/* JURÍDICO */}
+      <section id="juridico" style={{ background: s.off, padding: '5.5rem 7vw' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, marginBottom: '0.7rem' }}>
+            Assessoria <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
+          </span>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde, marginBottom: '1rem' }}>Assessoria Jurídica Imobiliária</h2>
+          <p style={{ fontSize: '0.9rem', color: s.cinza, lineHeight: 1.85, maxWidth: 620, margin: '0 auto', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
+            Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+          {[
+            { icon: '📄', titulo: 'Contratos Imobiliários', desc: 'Elaboração e revisão de contratos de compra e venda, promessa de compra, locação, permuta e cessão de direitos.' },
+            { icon: '🏛️', titulo: 'Regularização de Imóveis', desc: 'Apoio em escritura, registro, averbações, matrícula, inventário, desmembramento e pendências documentais.' },
+            { icon: '⚖️', titulo: 'Usucapião', desc: 'Análise de viabilidade, organização documental e acompanhamento jurídico para regularização da posse.' },
+          ].map(card => (
+            <div key={card.titulo} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, padding: '2rem 1.75rem', borderTop: `3px solid ${s.ouro}` }}>
+              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{card.icon}</div>
+              <h3 style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.15rem', fontWeight: 600, color: s.verde, marginBottom: '0.75rem' }}>{card.titulo}</h3>
+              <p style={{ fontSize: '0.85rem', color: s.cinza, lineHeight: 1.8, fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{card.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: s.verde, borderRadius: 2, padding: '2.5rem 3rem', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '2rem' }}>
+          <div>
+            <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.2rem', color: s.ouro, marginBottom: '0.5rem' }}>Dra. Maíra Ribeiro de Rezende</p>
+            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', fontFamily: s.ftexto + ', sans-serif' }}>Advogada • OAB/MG • Especialista em Direito Imobiliário</p>
+          </div>
+          <a href={`https://wa.me/${WPP}?text=${encodeURIComponent('Olá! Gostaria de falar com o setor jurídico sobre assessoria imobiliária.')}`} target="_blank" style={{ background: s.ouro, color: s.verde, padding: '0.9rem 2rem', borderRadius: 1, textDecoration: 'none', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontFamily: s.ftexto + ', sans-serif' }}>
+            Falar com o setor jurídico
+          </a>
+        </div>
+      </section>
+
+      <div className="divisor" />
+
       {/* CONTATO */}
       <section id="contato" style={{ background: s.verde, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'start', padding: '5.5rem 7vw' }}>
         <div>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Fale comigo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro, opacity: 0.5 }} />
           </span>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>Vamos encontrar<br />o imóvel ideal?</h2>
-          <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>Vamos encontrar<br />o imóvel ideal?</h2>
+          <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem', fontFamily: s.ftexto + ', sans-serif' }}>
             Entre em contato para agendar uma visita ou solicitar avaliação gratuita.
           </p>
           {[
@@ -420,12 +502,13 @@ export default function Home() {
         </div>
         <div>
           <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid rgba(223,192,120,0.18)` }}>
-            {['Fale comigo', 'Quero vender meu imóvel'].map((label, i) => (
+            {['Fale comigo', 'Quero vender meu imóvel', 'Assessoria jurídica'].map((label, i) => (
               <button key={label} id={`tab-${i}`} onClick={() => {
                 document.getElementById('cp-0')!.style.display = i === 0 ? 'block' : 'none'
                 document.getElementById('cp-1')!.style.display = i === 1 ? 'block' : 'none'
+                document.getElementById('cp-2')!.style.display = i === 2 ? 'block' : 'none'
                 document.querySelectorAll('[data-tab]').forEach((b, j) => (b as HTMLButtonElement).style.borderBottom = j === i ? `2px solid ${s.ouro}` : '2px solid transparent')
-              }} data-tab style={{ background: 'transparent', border: 'none', borderBottom: i === 0 ? `2px solid ${s.ouro}` : '2px solid transparent', color: i === 0 ? s.ouro : 'rgba(255,255,255,0.38)', padding: '0.7rem 1.4rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.68rem', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1 }}>
+              }} data-tab style={{ background: 'transparent', border: 'none', borderBottom: i === 0 ? `2px solid ${s.ouro}` : '2px solid transparent', color: i === 0 ? s.ouro : 'rgba(255,255,255,0.38)', padding: '0.7rem 1rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1 }}>
                 {label}
               </button>
             ))}
@@ -437,28 +520,29 @@ export default function Home() {
                 {[{ id: 'f-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text', required: true }, { id: 'f-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel', required: false }].map(f => (
                   <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                     <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} type={f.type} placeholder={f.placeholder} required={f.required} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                    <input id={f.id} type={f.type} placeholder={f.placeholder} required={f.required} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
                   </div>
                 ))}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>E-mail</label>
-                <input id="f-email" type="email" placeholder="seu@email.com" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                <input id="f-email" type="email" placeholder="seu@email.com" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label>
-                <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }}>
+                <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }}>
                   <option>Comprar imóvel</option>
                   <option>Vender imóvel</option>
                   <option>Avaliação de imóvel</option>
+                  <option>Assessoria jurídica imobiliária</option>
                   <option>Outro</option>
                 </select>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Mensagem</label>
-                <textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
+                <textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
-              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
                 Enviar pelo WhatsApp
               </button>
             </form>
@@ -471,7 +555,7 @@ export default function Home() {
                 {[{ id: 'cap-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'cap-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
                   <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                     <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} type={f.type} placeholder={f.placeholder} required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                    <input id={f.id} type={f.type} placeholder={f.placeholder} required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
                   </div>
                 ))}
               </div>
@@ -494,16 +578,46 @@ export default function Home() {
                 {[{ id: 'cap-cidade', label: 'Cidade', placeholder: 'Ex: Campo Belo' }, { id: 'cap-bairro', label: 'Bairro', placeholder: 'Ex: Centro' }, { id: 'cap-area', label: 'Área (m²)', placeholder: 'Ex: 250' }, { id: 'cap-valor', label: 'Valor pretendido', placeholder: 'Ex: 350.000' }].map(f => (
                   <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                     <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} placeholder={f.placeholder} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                    <input id={f.id} placeholder={f.placeholder} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
                   </div>
                 ))}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label>
-                <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem, diferenciais..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
+                <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem, diferenciais..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
-              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
                 Enviar pelo WhatsApp
+              </button>
+            </form>
+          </div>
+
+          <div id="cp-2" style={{ paddingTop: '1.4rem', display: 'none' }}>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Fale com nossa advogada especialista em direito imobiliário.</p>
+            <form onSubmit={enviarJuridico} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
+                {[{ id: 'j-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'j-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
+                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
+                    <input id={f.id} type={f.type} placeholder={f.placeholder} required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Serviço</label>
+                <select id="j-servico" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
+                  <option>Contratos imobiliários</option>
+                  <option>Regularização de imóveis</option>
+                  <option>Usucapião</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descreva sua situação</label>
+                <textarea id="j-msg" placeholder="Conte brevemente o que você precisa..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
+              </div>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
+                Falar com o setor jurídico
               </button>
             </form>
           </div>
@@ -512,7 +626,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
+        <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
         <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2025 • Campo Belo — Todos os direitos reservados</span>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende</span>
       </footer>
