@@ -207,9 +207,9 @@ export default function Home() {
       )}
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 72, width: 'auto', objectFit: 'contain' }} />
+          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 80, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
