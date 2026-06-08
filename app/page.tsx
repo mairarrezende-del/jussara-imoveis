@@ -424,6 +424,11 @@ export default function Home() {
                     <p style={{ fontSize: '0.62rem', color: 'rgba(223,192,120,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sem foto</p>
                   )}
                   <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
+                  {im.fotos && im.fotos.length > 0 && (
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 3, padding: '0.4rem 0.6rem', background: 'linear-gradient(135deg, transparent 0%, rgba(4,49,55,0.7) 100%)' }}>
+                      <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 32, width: 'auto', objectFit: 'contain', opacity: 0.85 }} />
+                    </div>
+                  )}
                 </div>
                 <div style={{ padding: '1.15rem 1.4rem 1.4rem' }}>
                   <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.65rem', flexWrap: 'wrap' }}>
