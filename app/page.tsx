@@ -52,7 +52,8 @@ export default function Home() {
     fonte_texto: 'Open Sans',
   })
   const [filtro, setFiltro] = useState('')
-  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', vmin: '', vmax: '' })
+  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '', vmin: '', vmax: '' })
+  const [bairros, setBairros] = useState<string[]>([])
   const [carIdx, setCarIdx] = useState(0)
   const [lbOpen, setLbOpen] = useState(false)
   const [lbImovel, setLbImovel] = useState<Imovel | null>(null)
@@ -64,6 +65,7 @@ export default function Home() {
     fetchImoveis()
     fetchSlides()
     fetchConfig()
+    fetchBairros()
   }, [])
 
   useEffect(() => {
@@ -80,6 +82,14 @@ export default function Home() {
   async function fetchSlides() {
     const { data } = await supabase.from('carrossel').select('*').eq('ativo', true).order('ordem')
     if (data) setSlides(data)
+  }
+
+  async function fetchBairros() {
+    const { data } = await supabase.from('imoveis').select('bairro').eq('status', 'disponivel')
+    if (data) {
+      const lista = [...new Set(data.map((i: { bairro: string }) => i.bairro).filter(Boolean))].sort()
+      setBairros(lista)
+    }
   }
 
   async function fetchConfig() {
@@ -144,7 +154,7 @@ export default function Home() {
     if (busca.cidade && im.cidade !== busca.cidade) return false
     if (busca.tipo && im.tipo !== busca.tipo) return false
     if (busca.zona && im.zona !== busca.zona) return false
-    if (busca.vmin && im.preco < Number(busca.vmin)) return false
+    if (busca.bairro && im.bairro !== busca.bairro) return false
     if (busca.vmax && im.preco > Number(busca.vmax)) return false
     return true
   })
@@ -199,8 +209,7 @@ export default function Home() {
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.3rem', color: s.ouro, fontWeight: 600 }}>Jussara Ribeiro</span>
-          <span style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.6)', marginLeft: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Imóveis</span>
+          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 54, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
@@ -299,7 +308,7 @@ export default function Home() {
       <div id="busca" style={{ background: s.verde, padding: '2rem 5vw' }}>
         <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderRadius: 2, padding: '1.4rem 1.75rem' }}>
           <p style={{ fontFamily: s.ftitulo + ', serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>🔍 Buscar imóveis</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
               <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Palavra-chave</label>
               <input placeholder="Ex: casa 3 quartos..." onChange={e => setBusca(b => ({ ...b, texto: e.target.value }))} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
@@ -324,6 +333,13 @@ export default function Home() {
                 <option value="">Todas</option>
                 <option value="urbano">Urbano</option>
                 <option value="rural">Rural</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Bairro</label>
+              <select onChange={e => setBusca(b => ({ ...b, bairro: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+                <option value="">Todos</option>
+                {bairros.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
             <button onClick={() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.4rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, height: 'fit-content' }}>
