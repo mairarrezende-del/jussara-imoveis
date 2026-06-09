@@ -654,6 +654,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* VÍDEO DA CIDADE */}
+      {config.video_cidade && (
+        <section style={{ background: '#021e22', padding: '0', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ textAlign: 'center', padding: '2.5rem 5vw 1.5rem', background: 'linear-gradient(to bottom, #021e22, transparent)', position: 'relative', zIndex: 2 }}>
+            <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+              Campo Belo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
+            </span>
+            <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.4rem, 2vw, 2rem)', fontWeight: 400, color: s.branco, marginTop: '0.5rem' }}>Nossa cidade</h2>
+          </div>
+          <div style={{ width: '100%', maxHeight: 480, overflow: 'hidden', position: 'relative' }}>
+            {config.video_cidade_tipo === 'upload' ? (
+              <video
+                src={config.video_cidade}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <iframe
+                src={config.video_cidade.includes('youtube') || config.video_cidade.includes('youtu.be')
+                  ? `https://www.youtube.com/embed/${config.video_cidade.split('v=')[1]?.split('&')[0] || config.video_cidade.split('youtu.be/')[1]}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0`
+                  : config.video_cidade}
+                style={{ width: '100%', height: 480, border: 'none', display: 'block' }}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            )}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(2,30,34,0.3) 0%, transparent 30%, transparent 70%, rgba(2,30,34,0.5) 100%)', pointerEvents: 'none' }} />
+          </div>
+        </section>
+      )}
+
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>

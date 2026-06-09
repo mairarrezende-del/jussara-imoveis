@@ -113,6 +113,12 @@ const GRUPOS_TEXTO = [
       { chave: 'footer_creci', label: 'CRECI / registros' },
     ]
   },
+  {
+    grupo: '🎬 Vídeo da Cidade',
+    campos: [
+      { chave: 'video_cidade', label: 'Link do vídeo (YouTube) ou URL do arquivo' },
+    ]
+  },
 ]
 
 export default function AdminPage() {
@@ -230,6 +236,26 @@ export default function AdminPage() {
     }
     setSalvando(false)
     setMsg('✅ Configurações salvas! Recarregue o site para ver as mudanças.')
+    setTimeout(() => setMsg(''), 4000)
+  }
+
+  async function uploadVideo(file: File): Promise<string> {
+    const nome = `${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, '-')}`
+    const { data, error } = await supabase.storage.from('videos').upload(nome, file, { upsert: true })
+    if (error) throw error
+    const { data: url } = supabase.storage.from('videos').getPublicUrl(data.path)
+    return url.publicUrl
+  }
+
+  async function handleVideoUpload(file: File) {
+    setSalvando(true)
+    setMsg('⏳ Enviando vídeo...')
+    try {
+      const url = await uploadVideo(file)
+      setConfig(c => ({ ...c, video_cidade: url, video_cidade_tipo: 'upload' }))
+      setMsg('✅ Vídeo carregado! Clique em Salvar configurações.')
+    } catch { setMsg('❌ Erro ao enviar vídeo') }
+    setSalvando(false)
     setTimeout(() => setMsg(''), 4000)
   }
 
@@ -550,6 +576,45 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🎬 Vídeo da Cidade</p>
+              <div style={campo}>
+                <label style={lbl}>Opção de vídeo</label>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
+                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo !== 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'link' }))} />
+                    Link (YouTube)
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
+                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo === 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'upload' }))} />
+                    Upload de arquivo
+                  </label>
+                </div>
+                {config.video_cidade_tipo === 'upload' ? (
+                  <div>
+                    <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative', marginBottom: '0.75rem' }}>
+                      <input type="file" accept="video/*" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                      <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>🎬 Clique para fazer upload do vídeo</p>
+                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>MP4, MOV, WebM • Recomendado até 50MB</p>
+                    </div>
+                    {config.video_cidade && config.video_cidade_tipo === 'upload' && (
+                      <video src={config.video_cidade} controls style={{ width: '100%', borderRadius: 1, maxHeight: 200 }} />
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <input style={inp()} value={config.video_cidade || ''} onChange={e => setConfig(c => ({ ...c, video_cidade: e.target.value, video_cidade_tipo: 'link' }))} placeholder="https://www.youtube.com/watch?v=..." />
+                    {config.video_cidade && config.video_cidade_tipo !== 'upload' && (
+                      <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.5rem' }}>✅ Link configurado</p>
+                    )}
+                  </div>
+                )}
+                {!config.video_cidade && (
+                  <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.25)', marginTop: '0.5rem' }}>Nenhum vídeo configurado. O espaço ficará oculto no site.</p>
+                )}
+              </div>
+            </div>
+
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔒 Segurança</p>
               <div style={campo}>
