@@ -207,13 +207,13 @@ export default function Home() {
       )}
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 80, width: 'auto', objectFit: 'contain' }} />
+          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 88, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
-            <a key={href} href={href} style={{ fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
+            <a key={href} href={href} style={{ fontSize: '0.82rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
               {['Início', 'Sobre', 'Imóveis', 'Jurídico', 'Contato'][i]}
             </a>
           ))}
@@ -425,8 +425,8 @@ export default function Home() {
                   )}
                   <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
                   {im.fotos && im.fotos.length > 0 && (
-                    <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 3, padding: '0.4rem 0.6rem', background: 'linear-gradient(135deg, transparent 0%, rgba(4,49,55,0.7) 100%)' }}>
-                      <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 32, width: 'auto', objectFit: 'contain', opacity: 0.85 }} />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 3, padding: '0.6rem', background: 'linear-gradient(to top, rgba(4,49,55,0.92) 0%, rgba(4,49,55,0.4) 70%, transparent 100%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', height: '45%' }}>
+                      <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
                     </div>
                   )}
                 </div>
