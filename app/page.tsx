@@ -188,7 +188,12 @@ export default function Home() {
         <div onClick={fecharLb} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(2,10,12,0.96)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <button onClick={fecharLb} style={{ position: 'fixed', top: '1rem', right: '1.5rem', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 40, height: 40, borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           {lbImovel.fotos && lbImovel.fotos.length > 0 ? (
-            <img src={lbImovel.fotos[lbFotoIdx]} alt={lbImovel.titulo} style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 2 }} onClick={e => e.stopPropagation()} />
+            <div style={{ position: 'relative', display: 'inline-block' }} onClick={e => e.stopPropagation()}>
+              <img src={lbImovel.fotos[lbFotoIdx]} alt={lbImovel.titulo} style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 2, display: 'block' }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.9) 0%, rgba(4,49,55,0.3) 60%, transparent 100%)', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', height: '40%', borderRadius: '0 0 2px 2px' }}>
+                <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 44, width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
+              </div>
+            </div>
           ) : (
             <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponível</div>
           )}
