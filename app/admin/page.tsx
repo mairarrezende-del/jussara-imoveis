@@ -178,9 +178,11 @@ export default function AdminPage() {
   }
 
   function gerarSlug(titulo: string) {
-    return titulo.toLowerCase()
+    const base = titulo.toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+    const sufixo = Date.now().toString(36).slice(-4)
+    return `${base}-${sufixo}`
   }
 
   async function salvarImovel() {
@@ -231,11 +233,20 @@ export default function AdminPage() {
 
   async function salvarConfig() {
     setSalvando(true)
-    for (const [chave, valor] of Object.entries(config)) {
-      await supabase.from('configuracoes').upsert({ chave, valor }, { onConflict: 'chave' })
+    try {
+      for (const [chave, valor] of Object.entries(config)) {
+        const { data } = await supabase.from('configuracoes').select('id').eq('chave', chave).single()
+        if (data) {
+          await supabase.from('configuracoes').update({ valor }).eq('chave', chave)
+        } else {
+          await supabase.from('configuracoes').insert({ chave, valor })
+        }
+      }
+      setMsg('✅ Configurações salvas! Recarregue o site para ver as mudanças.')
+    } catch {
+      setMsg('❌ Erro ao salvar configurações')
     }
     setSalvando(false)
-    setMsg('✅ Configurações salvas! Recarregue o site para ver as mudanças.')
     setTimeout(() => setMsg(''), 4000)
   }
 
