@@ -270,6 +270,26 @@ export default function AdminPage() {
     setTimeout(() => setMsg(''), 4000)
   }
 
+  async function converterParaJpg(file: File): Promise<File> {
+    if (!file.type.includes('heic') && !file.type.includes('heif') && !file.name.toLowerCase().endsWith('.heic') && !file.name.toLowerCase().endsWith('.heif')) {
+      return file
+    }
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        try {
+          const heic2any = (await import('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js' as any)).default
+          const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
+          const jpgFile = new File([blob as Blob], file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'), { type: 'image/jpeg' })
+          resolve(jpgFile)
+        } catch {
+          reject(new Error('Erro ao converter HEIC'))
+        }
+      }
+      reader.readAsArrayBuffer(file)
+    })
+  }
+
   async function uploadFoto(file: File, tipo: 'imovel' | 'carrossel'): Promise<string> {
     const nome = `${tipo}/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, '-')}`
     const { data, error } = await supabase.storage.from('fotos').upload(nome, file, { upsert: true })
@@ -284,7 +304,10 @@ export default function AdminPage() {
     setMsg('⏳ Enviando fotos...')
     const urls: string[] = []
     for (const file of Array.from(files)) {
-      try { urls.push(await uploadFoto(file, 'imovel')) } catch (e) { console.error(e) }
+      try {
+        const fileConvertido = await converterParaJpg(file)
+        urls.push(await uploadFoto(fileConvertido, 'imovel'))
+      } catch (e) { console.error(e) }
     }
     setEditando({ ...editando, fotos: [...(editando.fotos || []), ...urls] })
     setSalvando(false)
