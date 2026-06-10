@@ -433,9 +433,9 @@ export default function AdminPage() {
                 <div style={campo}>
                   <label style={lbl}>Fotos do imóvel</label>
                   <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative' }}>
-                    <input type="file" multiple accept="image/*" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                    <input type="file" multiple accept="image/*,.heic,.heif" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                     <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>📸 Clique para adicionar fotos</p>
-                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP • Múltiplas fotos permitidas</p>
+                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP, HEIC • Múltiplas fotos permitidas</p>
                   </div>
                   {editando.fotos && editando.fotos.length > 0 && (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.75rem' }}>
