@@ -227,8 +227,8 @@ export default function Home() {
           </button>
           <a href={`https://wa.me/${WPP}`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: s.ouro, textDecoration: 'none', fontSize: '0.72rem' }}>
             <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-              <small style={{ fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)' }}>Fale conosco</small>
-              <strong style={{ fontSize: '0.8rem', fontWeight: 500 }}>(35) 99746-1643</strong>
+              <small style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)' }}>Fale conosco</small>
+              <strong style={{ fontSize: '1rem', fontWeight: 500 }}>(35) 99746-1643</strong>
             </span>
           </a>
         </div>
