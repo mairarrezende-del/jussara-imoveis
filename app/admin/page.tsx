@@ -409,7 +409,7 @@ export default function AdminPage() {
                       )}
                       <div>
                         <p style={{ color: s.branco, fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.2rem' }}>{im.titulo}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.75rem' }}>{im.cidade} • {TIPOS[im.tipo as keyof typeof TIPOS] || im.tipo} • {im.zona} • {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}</p>
+                        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.75rem' }}>{im.cidade} • {TIPOS[im.tipo as keyof typeof TIPOS] || im.tipo} • {im.zona} • {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Consulte'}</p>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -440,7 +440,20 @@ export default function AdminPage() {
                   <div style={campo}><label style={lbl}>Zona</label><select style={{ ...inp(), background: s.verde }} value={editando.zona} onChange={e => setEditando({ ...editando, zona: e.target.value })}><option value="urbano">Urbano</option><option value="rural">Rural</option></select></div>
                   <div style={campo}><label style={lbl}>Cidade</label><select style={{ ...inp(), background: s.verde }} value={editando.cidade} onChange={e => setEditando({ ...editando, cidade: e.target.value })}>{CIDADES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                   <div style={campo}><label style={lbl}>Bairro</label><input style={inp()} value={editando.bairro} onChange={e => setEditando({ ...editando, bairro: e.target.value })} placeholder="Ex: Centro" /></div>
-                  <div style={campo}><label style={lbl}>Preço (R$)</label><input style={inp()} type="number" value={editando.preco || ''} onChange={e => setEditando({ ...editando, preco: Number(e.target.value) })} placeholder="Ex: 380000" /></div>
+                  <div style={campo}>
+                    <label style={lbl}>Preço (R$)</label>
+                    <input
+                      style={inp()}
+                      type="text"
+                      value={editando.preco > 0 ? editando.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/\./g, '').replace(',', '.')
+                        const num = parseFloat(raw)
+                        setEditando({ ...editando, preco: isNaN(num) ? 0 : Math.round(num) })
+                      }}
+                      placeholder="Ex: 270.000,00"
+                    />
+                  </div>
                   <div style={campo}><label style={lbl}>Área (m²)</label><input style={inp()} type="number" value={editando.area || ''} onChange={e => setEditando({ ...editando, area: Number(e.target.value) })} placeholder="Ex: 120" /></div>
                   <div style={campo}><label style={lbl}>Quartos</label><input style={inp()} type="number" value={editando.quartos || ''} onChange={e => setEditando({ ...editando, quartos: Number(e.target.value) })} placeholder="Ex: 3" /></div>
                   <div style={campo}><label style={lbl}>Banheiros</label><input style={inp()} type="number" value={editando.banheiros || ''} onChange={e => setEditando({ ...editando, banheiros: Number(e.target.value) })} placeholder="Ex: 2" /></div>
@@ -541,18 +554,9 @@ export default function AdminPage() {
                   <div key={f.chave} style={campo}>
                     <label style={lbl}>{f.label}</label>
                     {(f as any).grande ? (
-                      <textarea
-                        value={config[f.chave] || ''}
-                        onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))}
-                        rows={3}
-                        style={{ ...inp(), resize: 'vertical', minHeight: 80 }}
-                      />
+                      <textarea value={config[f.chave] || ''} onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))} rows={3} style={{ ...inp(), resize: 'vertical', minHeight: 80 }} />
                     ) : (
-                      <input
-                        value={config[f.chave] || ''}
-                        onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))}
-                        style={inp()}
-                      />
+                      <input value={config[f.chave] || ''} onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))} style={inp()} />
                     )}
                   </div>
                 ))}
@@ -648,7 +652,6 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
-
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔒 Segurança</p>
               <div style={campo}>
