@@ -224,14 +224,37 @@ export default function AdminPage() {
   }
 
   async function salvarConfig() {
-    setSalvando(true)
+  setSalvando(true)
+  try {
     for (const [chave, valor] of Object.entries(config)) {
-      await supabase.from('configuracoes').upsert({ chave, valor }, { onConflict: 'chave' })
+      // 1. Verifica se a chave já existe
+      const { data: existing } = await supabase
+        .from('configuracoes')
+        .select('chave')
+        .eq('chave', chave)
+        .single()
+
+      if (existing) {
+        // 2a. Existe → UPDATE
+        await supabase
+          .from('configuracoes')
+          .update({ valor })
+          .eq('chave', chave)
+      } else {
+        // 2b. Não existe → INSERT
+        await supabase
+          .from('configuracoes')
+          .insert({ chave, valor })
+      }
     }
-    setSalvando(false)
     setMsg('✅ Configurações salvas! Recarregue o site para ver as mudanças.')
-    setTimeout(() => setMsg(''), 4000)
+  } catch (e) {
+    setMsg('❌ Erro ao salvar configurações.')
+    console.error(e)
   }
+  setSalvando(false)
+  setTimeout(() => setMsg(''), 4000)
+}
 
   async function uploadFoto(file: File, tipo: 'imovel' | 'carrossel'): Promise<string> {
     const nome = `${tipo}/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, '-')}`
