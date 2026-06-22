@@ -32,11 +32,16 @@ const TIPO_LABEL: Record<string, string> = {
 
 const LOGO_URL = 'https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png'
 const WPP = '5535997461643'
+const BASE_URL = 'https://www.jussararibeiro-imoveis.com.br'
 
 const s = {
   verde: '#043137', verdeM: '#065460', ouro: '#DFC078',
   branco: '#FFFFFF', off: '#F8F6F2', cinza: '#7A7A7A',
   borda: 'rgba(223,192,120,0.22)'
+}
+
+function formatarPreco(preco: number): string {
+  return preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 export default function ImovelPage() {
@@ -68,6 +73,8 @@ export default function ImovelPage() {
       <Link href="/" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', textDecoration: 'none' }}>← Voltar ao início</Link>
     </div>
   )
+
+  const urlImovel = `${BASE_URL}/imoveis/${imovel.slug}`
 
   return (
     <div style={{ minHeight: '100vh', background: s.off, fontFamily: 'Open Sans, sans-serif' }}>
@@ -185,9 +192,13 @@ export default function ImovelPage() {
           <div style={{ background: s.verde, borderRadius: 2, padding: '2rem', color: s.branco }}>
             <p style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)', marginBottom: '0.5rem' }}>Valor</p>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: s.ouro, marginBottom: '1.5rem', lineHeight: 1 }}>
-              {imovel.preco > 0 ? `R$ ${imovel.preco.toLocaleString('pt-BR')}` : 'Consulte'}
+              {imovel.preco > 0 ? `R$ ${formatarPreco(imovel.preco)}` : 'Consulte'}
             </p>
-            <a href={`https://wa.me/${WPP}?text=${encodeURIComponent(`Olá, Jussara! Tenho interesse no imóvel: *${imovel.titulo}*\n${window.location.href}`)}`} target="_blank" style={{ display: 'block', background: '#25D366', color: s.branco, textAlign: 'center', padding: '1rem', borderRadius: 1, textDecoration: 'none', fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+            <a
+              href={`https://wa.me/${WPP}?text=${encodeURIComponent(`Olá, Jussara! Tenho interesse no imóvel: *${imovel.titulo}*\n${urlImovel}`)}`}
+              target="_blank"
+              style={{ display: 'block', background: '#25D366', color: s.branco, textAlign: 'center', padding: '1rem', borderRadius: 1, textDecoration: 'none', fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}
+            >
               💬 Falar no WhatsApp
             </a>
             <a href={`tel:+${WPP}`} style={{ display: 'block', background: 'transparent', color: s.ouro, textAlign: 'center', padding: '0.9rem', borderRadius: 1, textDecoration: 'none', fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', border: `1px solid rgba(223,192,120,0.3)` }}>
@@ -203,7 +214,7 @@ export default function ImovelPage() {
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <img src={LOGO_URL} alt="Jussara Ribeiro Imóveis" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
-        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2025 • Campo Belo — Todos os direitos reservados</span>
+        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2026 • Campo Belo — Todos os direitos reservados</span>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende</span>
       </footer>
     </div>

@@ -39,8 +39,9 @@ const TIPO_LABEL: Record<string, string> = {
 
 const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
 
-const FONTES_TITULO = ['Cormorant Garamond', 'Playfair Display', 'Merriweather', 'Lora', 'Georgia']
-const FONTES_TEXTO = ['Open Sans', 'Lato', 'Roboto', 'Montserrat', 'Raleway']
+function formatarPreco(preco: number): string {
+  return preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
 
 export default function Home() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
@@ -172,7 +173,6 @@ export default function Home() {
     ftexto: config.fonte_texto || 'Open Sans',
   }
 
-  // Injetar fontes do Google dinamicamente
   useEffect(() => {
     const fontes = [s.ftitulo, s.ftexto].map(f => f.replace(/ /g, '+')).join('|')
     const link = document.createElement('link')
@@ -361,7 +361,6 @@ export default function Home() {
         <div style={{ position: 'relative' }}>
           <div style={{ aspectRatio: '4/5', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
             <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>
-            {/* Logo sobreposta no rodapé da foto */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.95) 0%, transparent 100%)', padding: '1.5rem 1.25rem 1rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 70, width: 'auto', objectFit: 'contain' }} />
             </div>
@@ -449,7 +448,7 @@ export default function Home() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid rgba(4,49,55,0.07)`, paddingTop: '0.9rem' }}>
                     <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
-                      {im.preco > 0 ? `R$ ${im.preco.toLocaleString('pt-BR')}` : 'Consulte'}
+                      {im.preco > 0 ? `R$ ${formatarPreco(im.preco)}` : 'Consulte'}
                     </p>
                     <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Ver detalhes →</Link>
                   </div>
@@ -665,14 +664,7 @@ export default function Home() {
           </div>
           <div style={{ width: '100%', maxHeight: 480, overflow: 'hidden', position: 'relative' }}>
             {config.video_cidade_tipo === 'upload' ? (
-              <video
-                src={config.video_cidade}
-                autoPlay
-                muted
-                loop
-                playsInline
-                style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }}
-              />
+              <video src={config.video_cidade} autoPlay muted loop playsInline style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }} />
             ) : (
               <iframe
                 src={config.video_cidade.includes('youtube') || config.video_cidade.includes('youtu.be')
@@ -691,7 +683,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
-        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2025 • Campo Belo — Todos os direitos reservados</span>
+        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2026 • Campo Belo — Todos os direitos reservados</span>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende</span>
       </footer>
 
