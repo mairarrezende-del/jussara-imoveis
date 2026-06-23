@@ -51,74 +51,14 @@ const imovelVazio: Imovel = {
 }
 
 const GRUPOS_TEXTO = [
-  {
-    grupo: '🏠 Navegação',
-    campos: [
-      { chave: 'nav_nome', label: 'Nome no menu' },
-      { chave: 'nav_subtitulo', label: 'Subtítulo no menu' },
-    ]
-  },
-  {
-    grupo: '🌟 Seção Principal (Hero)',
-    campos: [
-      { chave: 'hero_tag', label: 'Tag acima do título' },
-      { chave: 'hero_titulo', label: 'Título principal', grande: true },
-      { chave: 'hero_subtitulo', label: 'Subtítulo / descrição', grande: true },
-      { chave: 'hero_stat1_num', label: 'Estatística 1 — número' },
-      { chave: 'hero_stat1_label', label: 'Estatística 1 — label' },
-      { chave: 'hero_stat2_num', label: 'Estatística 2 — número' },
-      { chave: 'hero_stat2_label', label: 'Estatística 2 — label' },
-      { chave: 'hero_stat3_num', label: 'Estatística 3 — número' },
-      { chave: 'hero_stat3_label', label: 'Estatística 3 — label' },
-    ]
-  },
-  {
-    grupo: '👤 Seção Sobre',
-    campos: [
-      { chave: 'sobre_titulo', label: 'Nome da corretora' },
-      { chave: 'sobre_anos', label: 'Anos de experiência (destaque)' },
-      { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true },
-      { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true },
-    ]
-  },
-  {
-    grupo: '⚖️ Seção Jurídico',
-    campos: [
-      { chave: 'juridico_titulo', label: 'Título da seção' },
-      { chave: 'juridico_subtitulo', label: 'Subtítulo', grande: true },
-      { chave: 'juridico_advogada', label: 'Nome da advogada' },
-      { chave: 'juridico_oab', label: 'Descrição / OAB' },
-    ]
-  },
-  {
-    grupo: '📬 Seção Contato',
-    campos: [
-      { chave: 'contato_titulo', label: 'Título' },
-      { chave: 'contato_subtitulo', label: 'Subtítulo', grande: true },
-      { chave: 'localizacao', label: 'Localização' },
-    ]
-  },
-  {
-    grupo: '📱 Redes Sociais',
-    campos: [
-      { chave: 'whatsapp', label: 'WhatsApp (só números, com DDI)' },
-      { chave: 'instagram', label: 'Instagram (só o @, sem @)' },
-      { chave: 'facebook', label: 'Facebook (URL completa)' },
-    ]
-  },
-  {
-    grupo: '📄 Rodapé',
-    campos: [
-      { chave: 'footer_texto', label: 'Texto do rodapé' },
-      { chave: 'footer_creci', label: 'CRECI / registros' },
-    ]
-  },
-  {
-    grupo: '🎬 Vídeo da Cidade',
-    campos: [
-      { chave: 'video_cidade', label: 'Link do vídeo (YouTube) ou URL do arquivo' },
-    ]
-  },
+  { grupo: '🏠 Navegação', campos: [{ chave: 'nav_nome', label: 'Nome no menu' }, { chave: 'nav_subtitulo', label: 'Subtítulo no menu' }] },
+  { grupo: '🌟 Seção Principal (Hero)', campos: [{ chave: 'hero_tag', label: 'Tag acima do título' }, { chave: 'hero_titulo', label: 'Título principal', grande: true }, { chave: 'hero_subtitulo', label: 'Subtítulo / descrição', grande: true }, { chave: 'hero_stat1_num', label: 'Estatística 1 — número' }, { chave: 'hero_stat1_label', label: 'Estatística 1 — label' }, { chave: 'hero_stat2_num', label: 'Estatística 2 — número' }, { chave: 'hero_stat2_label', label: 'Estatística 2 — label' }, { chave: 'hero_stat3_num', label: 'Estatística 3 — número' }, { chave: 'hero_stat3_label', label: 'Estatística 3 — label' }] },
+  { grupo: '👤 Seção Sobre', campos: [{ chave: 'sobre_titulo', label: 'Nome da corretora' }, { chave: 'sobre_anos', label: 'Anos de experiência (destaque)' }, { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true }, { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true }] },
+  { grupo: '⚖️ Seção Jurídico', campos: [{ chave: 'juridico_titulo', label: 'Título da seção' }, { chave: 'juridico_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'juridico_advogada', label: 'Nome da advogada' }, { chave: 'juridico_oab', label: 'Descrição / OAB' }] },
+  { grupo: '📬 Seção Contato', campos: [{ chave: 'contato_titulo', label: 'Título' }, { chave: 'contato_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'localizacao', label: 'Localização' }] },
+  { grupo: '📱 Redes Sociais', campos: [{ chave: 'whatsapp', label: 'WhatsApp (só números, com DDI)' }, { chave: 'instagram', label: 'Instagram (só o @, sem @)' }, { chave: 'facebook', label: 'Facebook (URL completa)' }] },
+  { grupo: '📄 Rodapé', campos: [{ chave: 'footer_texto', label: 'Texto do rodapé' }, { chave: 'footer_creci', label: 'CRECI / registros' }] },
+  { grupo: '🎬 Vídeo da Cidade', campos: [{ chave: 'video_cidade', label: 'Link do vídeo (YouTube) ou URL do arquivo' }] },
 ]
 
 export default function AdminPage() {
@@ -126,12 +66,12 @@ export default function AdminPage() {
   const [senhaInput, setSenhaInput] = useState('')
   const [erroSenha, setErroSenha] = useState(false)
   const [senhaAdmin, setSenhaAdmin] = useState('jussara2025')
-
   const [aba, setAba] = useState('imoveis')
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
   const [config, setConfig] = useState<Config>({})
   const [editando, setEditando] = useState<Imovel | null>(null)
+  const [precoTexto, setPrecoTexto] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [msg, setMsg] = useState('')
 
@@ -177,6 +117,29 @@ export default function AdminPage() {
     if (data) setSlides(data)
   }
 
+  function abrirEdicao(im: Imovel) {
+    setEditando(im)
+    setPrecoTexto(im.preco > 0 ? im.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '')
+    setAba('editar')
+  }
+
+  function abrirNovo() {
+    setEditando({ ...imovelVazio })
+    setPrecoTexto('')
+    setAba('novo')
+  }
+
+  function handlePrecoChange(valor: string) {
+    // Permite digitar livremente: apenas números, ponto e vírgula
+    setPrecoTexto(valor)
+    // Converte para número: remove pontos de milhar, troca vírgula por ponto
+    const raw = valor.replace(/\./g, '').replace(',', '.')
+    const num = parseFloat(raw)
+    if (editando) {
+      setEditando({ ...editando, preco: isNaN(num) ? 0 : Math.round(num) })
+    }
+  }
+
   function gerarSlug(titulo: string) {
     const base = titulo.toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -199,7 +162,7 @@ export default function AdminPage() {
     }
     setSalvando(false)
     if (erro) { setMsg('❌ Erro: ' + erro.message) }
-    else { setMsg('✅ Imóvel salvo!'); setEditando(null); fetchImoveis() }
+    else { setMsg('✅ Imóvel salvo!'); setEditando(null); setPrecoTexto(''); fetchImoveis() }
     setTimeout(() => setMsg(''), 3000)
   }
 
@@ -276,15 +239,13 @@ export default function AdminPage() {
     }
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
-      reader.onload = async (e) => {
+      reader.onload = async () => {
         try {
           const heic2any = (await import('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js' as any)).default
           const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
           const jpgFile = new File([blob as Blob], file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'), { type: 'image/jpeg' })
           resolve(jpgFile)
-        } catch {
-          reject(new Error('Erro ao converter HEIC'))
-        }
+        } catch { reject(new Error('Erro ao converter HEIC')) }
       }
       reader.readAsArrayBuffer(file)
     })
@@ -354,8 +315,6 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: s.verde, fontFamily: 'Open Sans, sans-serif' }}>
-
-      {/* HEADER */}
       <div style={{ background: '#021e22', borderBottom: `1px solid ${s.borda}`, padding: '1rem 3vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.4rem', fontWeight: 400 }}>🏠 Painel Admin</h1>
@@ -367,17 +326,15 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* MENSAGEM */}
       {msg && (
         <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>
           {msg}
         </div>
       )}
 
-      {/* ABAS */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw', overflowX: 'auto' }}>
         {[['imoveis', '🏡 Imóveis'], ['carrossel', '🖼️ Carrossel'], ['novo', '+ Novo Imóvel'], ['textos', '✏️ Textos'], ['configuracoes', '⚙️ Visual']].map(([v, l]) => (
-          <button key={v} onClick={() => { setAba(v); if (v === 'novo') setEditando({ ...imovelVazio }) }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>
+          <button key={v} onClick={() => { setAba(v); if (v === 'novo') abrirNovo() }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>
             {l}
           </button>
         ))}
@@ -390,7 +347,7 @@ export default function AdminPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Imóveis cadastrados ({imoveis.length})</h2>
-              <button onClick={() => { setAba('novo'); setEditando({ ...imovelVazio }) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imóvel</button>
+              <button onClick={abrirNovo} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imóvel</button>
             </div>
             {imoveis.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}>
@@ -414,7 +371,7 @@ export default function AdminPage() {
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: 1, background: im.status === 'disponivel' ? 'rgba(50,200,100,0.15)' : 'rgba(200,50,50,0.15)', color: im.status === 'disponivel' ? '#50c878' : '#ff8080', border: `1px solid ${im.status === 'disponivel' ? 'rgba(50,200,100,0.3)' : 'rgba(200,50,50,0.3)'}` }}>{im.status}</span>
-                      <button onClick={() => { setEditando(im); setAba('editar') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: s.ouro, padding: '0.35rem 0.8rem', borderRadius: 1, fontSize: '0.68rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Editar</button>
+                      <button onClick={() => abrirEdicao(im)} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: s.ouro, padding: '0.35rem 0.8rem', borderRadius: 1, fontSize: '0.68rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Editar</button>
                       <button onClick={() => excluirImovel(im.id!)} style={{ background: 'rgba(200,50,50,0.12)', border: `1px solid rgba(200,50,50,0.25)`, color: '#ff8080', padding: '0.35rem 0.8rem', borderRadius: 1, fontSize: '0.68rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>Excluir</button>
                     </div>
                   </div>
@@ -428,7 +385,7 @@ export default function AdminPage() {
         {(aba === 'novo' || aba === 'editar') && editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem 0.8rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>← Voltar</button>
+              <button onClick={() => { setEditando(null); setPrecoTexto(''); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem 0.8rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>← Voltar</button>
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>{editando.id ? 'Editar imóvel' : 'Novo imóvel'}</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
@@ -445,14 +402,15 @@ export default function AdminPage() {
                     <input
                       style={inp()}
                       type="text"
-                      value={editando.preco > 0 ? editando.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
-                      onChange={e => {
-                        const raw = e.target.value.replace(/\./g, '').replace(',', '.')
-                        const num = parseFloat(raw)
-                        setEditando({ ...editando, preco: isNaN(num) ? 0 : Math.round(num) })
-                      }}
-                      placeholder="Ex: 270.000,00"
+                      value={precoTexto}
+                      onChange={e => handlePrecoChange(e.target.value)}
+                      placeholder="Ex: 270000"
                     />
+                    {editando.preco > 0 && (
+                      <span style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.7)', marginTop: '0.25rem' }}>
+                        → R$ {editando.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    )}
                   </div>
                   <div style={campo}><label style={lbl}>Área (m²)</label><input style={inp()} type="number" value={editando.area || ''} onChange={e => setEditando({ ...editando, area: Number(e.target.value) })} placeholder="Ex: 120" /></div>
                   <div style={campo}><label style={lbl}>Quartos</label><input style={inp()} type="number" value={editando.quartos || ''} onChange={e => setEditando({ ...editando, quartos: Number(e.target.value) })} placeholder="Ex: 3" /></div>
@@ -494,7 +452,7 @@ export default function AdminPage() {
               <button onClick={salvarImovel} disabled={salvando} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: salvando ? 'not-allowed' : 'pointer', borderRadius: 1, opacity: salvando ? 0.7 : 1 }}>
                 {salvando ? 'Salvando...' : '💾 Salvar imóvel'}
               </button>
-              <button onClick={() => { setEditando(null); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.45)', padding: '0.9rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', cursor: 'pointer', borderRadius: 1 }}>Cancelar</button>
+              <button onClick={() => { setEditando(null); setPrecoTexto(''); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.45)', padding: '0.9rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', cursor: 'pointer', borderRadius: 1 }}>Cancelar</button>
             </div>
           </div>
         )}

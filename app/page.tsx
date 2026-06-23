@@ -51,6 +51,27 @@ export default function Home() {
     cor_destaque: '#DFC078',
     fonte_titulo: 'Cormorant Garamond',
     fonte_texto: 'Open Sans',
+    hero_titulo: 'Realizando o sonho de cada família com confiança',
+    hero_subtitulo: 'Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.',
+    hero_stat1_num: '+ 200', hero_stat1_label: 'Negócios realizados',
+    hero_stat2_num: '15 +', hero_stat2_label: 'Anos de experiência',
+    hero_stat3_num: '100%', hero_stat3_label: 'Compromisso',
+    sobre_titulo: 'Jussara Ribeiro',
+    sobre_anos: '15+',
+    sobre_p1: 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.',
+    sobre_p2: 'Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.',
+    juridico_titulo: 'Assessoria Jurídica Imobiliária',
+    juridico_subtitulo: 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.',
+    juridico_advogada: 'Dra. Maíra Ribeiro de Rezende',
+    juridico_oab: 'Advogada • OAB/MG • Especialista em Direito Imobiliário',
+    contato_titulo: 'Vamos encontrar o imóvel ideal?',
+    contato_subtitulo: 'Entre em contato para agendar uma visita ou solicitar avaliação gratuita.',
+    localizacao: 'Campo Belo • MG e região',
+    whatsapp: '5535997461643',
+    instagram: 'jussara_ribeirocorretora',
+    facebook: 'https://www.facebook.com/jussararibeirocorretora',
+    footer_texto: '© 2026 • Campo Belo — Todos os direitos reservados',
+    footer_creci: 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende',
   })
   const [filtro, setFiltro] = useState('')
   const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '', vmin: '', vmax: '' })
@@ -60,7 +81,7 @@ export default function Home() {
   const [lbImovel, setLbImovel] = useState<Imovel | null>(null)
   const [lbFotoIdx, setLbFotoIdx] = useState(0)
   const carTimer = useRef<NodeJS.Timeout | null>(null)
-  const WPP = '5535997461643'
+  const WPP = config.whatsapp || '5535997461643'
 
   useEffect(() => {
     fetchImoveis()
@@ -164,7 +185,6 @@ export default function Home() {
     verde: config.cor_principal || '#043137',
     verdeM: '#065460',
     ouro: config.cor_destaque || '#DFC078',
-    ouroC: '#EDD49A',
     branco: '#FFFFFF',
     off: '#F8F6F2',
     cinza: '#7A7A7A',
@@ -273,20 +293,24 @@ export default function Home() {
         <div style={{ position: 'relative', zIndex: 2, padding: '6vw 4vw 6vw 7vw', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.5rem' }}>
             <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
-            Corretora Imobiliária • Campo Belo, MG
+            {config.hero_tag || 'Corretora Imobiliária • Campo Belo, MG'}
           </div>
-          <h1 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem' }}>
-            Realizando o sonho<br />de cada <em style={{ fontStyle: 'italic', color: s.ouro }}>família</em><br />com confiança
+          <h1 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 400, lineHeight: 1.15, color: s.branco, marginBottom: '1.1rem', whiteSpace: 'pre-line' }}>
+            {config.hero_titulo || 'Realizando o sonho\nde cada família\ncom confiança'}
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, maxWidth: 390, marginBottom: '2rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.
+            {config.hero_subtitulo || 'Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.'}
           </p>
           <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
             <a href="#imoveis" className="btn-ouro">Ver imóveis</a>
             <a href="#contato" className="btn-ghost">Fale comigo</a>
           </div>
           <div style={{ display: 'flex', gap: '2rem', marginTop: '3rem', paddingTop: '1.75rem', borderTop: `1px solid ${s.borda}`, flexWrap: 'wrap' }}>
-            {[['+ 200', 'Negócios realizados'], ['15 +', 'Anos de experiência'], ['100%', 'Compromisso']].map(([n, l]) => (
+            {[
+              [config.hero_stat1_num || '+ 200', config.hero_stat1_label || 'Negócios realizados'],
+              [config.hero_stat2_num || '15 +', config.hero_stat2_label || 'Anos de experiência'],
+              [config.hero_stat3_num || '100%', config.hero_stat3_label || 'Compromisso'],
+            ].map(([n, l]) => (
               <div key={l}>
                 <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '2rem', color: s.ouro, lineHeight: 1, display: 'block' }}>{n}</span>
                 <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', display: 'block', marginTop: '0.28rem' }}>{l}</span>
@@ -366,7 +390,7 @@ export default function Home() {
             </div>
           </div>
           <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 2 }}>
-            <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>15+</strong>
+            <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>{config.sobre_anos || '15+'}</strong>
             <span style={{ fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Anos no mercado</span>
           </div>
         </div>
@@ -374,12 +398,12 @@ export default function Home() {
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Sobre mim <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
           </span>
-          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>Jussara Ribeiro</h2>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>{config.sobre_titulo || 'Jussara Ribeiro'}</h2>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.
+            {config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.'}
           </p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.
+            {config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.'}
           </p>
           {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
@@ -467,12 +491,11 @@ export default function Home() {
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Assessoria <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
           </span>
-          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde, marginBottom: '1rem' }}>Assessoria Jurídica Imobiliária</h2>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde, marginBottom: '1rem' }}>{config.juridico_titulo || 'Assessoria Jurídica Imobiliária'}</h2>
           <p style={{ fontSize: '0.9rem', color: s.cinza, lineHeight: 1.85, maxWidth: 620, margin: '0 auto', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.
+            {config.juridico_subtitulo || 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.'}
           </p>
         </div>
-
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
           {[
             { icon: '📄', titulo: 'Contratos Imobiliários', desc: 'Elaboração e revisão de contratos de compra e venda, promessa de compra, locação, permuta e cessão de direitos.' },
@@ -486,11 +509,10 @@ export default function Home() {
             </div>
           ))}
         </div>
-
         <div style={{ background: s.verde, borderRadius: 2, padding: '2.5rem 3rem', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '2rem' }}>
           <div>
-            <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.2rem', color: s.ouro, marginBottom: '0.5rem' }}>Dra. Maíra Ribeiro de Rezende</p>
-            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', fontFamily: s.ftexto + ', sans-serif' }}>Advogada • OAB/MG • Especialista em Direito Imobiliário</p>
+            <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.2rem', color: s.ouro, marginBottom: '0.5rem' }}>{config.juridico_advogada || 'Dra. Maíra Ribeiro de Rezende'}</p>
+            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', fontFamily: s.ftexto + ', sans-serif' }}>{config.juridico_oab || 'Advogada • OAB/MG • Especialista em Direito Imobiliário'}</p>
           </div>
           <a href={`https://wa.me/${WPP}?text=${encodeURIComponent('Olá! Gostaria de falar com o setor jurídico sobre assessoria imobiliária.')}`} target="_blank" style={{ background: s.ouro, color: s.verde, padding: '0.9rem 2rem', borderRadius: 1, textDecoration: 'none', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontFamily: s.ftexto + ', sans-serif' }}>
             Falar com o setor jurídico
@@ -506,15 +528,15 @@ export default function Home() {
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
             Fale comigo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro, opacity: 0.5 }} />
           </span>
-          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>Vamos encontrar<br />o imóvel ideal?</h2>
+          <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>{config.contato_titulo || 'Vamos encontrar\no imóvel ideal?'}</h2>
           <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem', fontFamily: s.ftexto + ', sans-serif' }}>
-            Entre em contato para agendar uma visita ou solicitar avaliação gratuita.
+            {config.contato_subtitulo || 'Entre em contato para agendar uma visita ou solicitar avaliação gratuita.'}
           </p>
           {[
             { icon: '📞', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
-            { icon: '📷', label: 'Instagram', value: '@jussara_ribeirocorretora', href: 'https://www.instagram.com/jussara_ribeirocorretora/' },
-            { icon: '📘', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: 'https://www.facebook.com/jussararibeirocorretora' },
-            { icon: '📍', label: 'Localização', value: 'Campo Belo • MG e região', href: undefined },
+            { icon: '📷', label: 'Instagram', value: `@${config.instagram || 'jussara_ribeirocorretora'}`, href: `https://www.instagram.com/${config.instagram || 'jussara_ribeirocorretora'}/` },
+            { icon: '📘', label: 'Facebook', value: 'Jussara Ribeiro Corretora', href: config.facebook || 'https://www.facebook.com/jussararibeirocorretora' },
+            { icon: '📍', label: 'Localização', value: config.localizacao || 'Campo Belo • MG e região', href: undefined },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', marginBottom: '1.35rem' }}>
               <div style={{ width: 42, height: 42, flexShrink: 0, border: `1px solid rgba(223,192,120,0.28)`, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1, fontSize: '1rem' }}>{item.icon}</div>
@@ -525,7 +547,7 @@ export default function Home() {
             </div>
           ))}
           <div style={{ marginTop: '2rem', paddingTop: '1.35rem', borderTop: `1px solid rgba(223,192,120,0.12)`, fontSize: '0.68rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em', lineHeight: 1.8 }}>
-            CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende<br />
+            {config.footer_creci || 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende'}<br />
             Registros profissionais ativos • Compra e Venda
           </div>
         </div>
@@ -542,7 +564,6 @@ export default function Home() {
               </button>
             ))}
           </div>
-
           <div id="cp-0" style={{ paddingTop: '1.4rem' }}>
             <form onSubmit={enviarContato} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
@@ -560,23 +581,16 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label>
                 <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }}>
-                  <option>Comprar imóvel</option>
-                  <option>Vender imóvel</option>
-                  <option>Avaliação de imóvel</option>
-                  <option>Assessoria jurídica imobiliária</option>
-                  <option>Outro</option>
+                  <option>Comprar imóvel</option><option>Vender imóvel</option><option>Avaliação de imóvel</option><option>Assessoria jurídica imobiliária</option><option>Outro</option>
                 </select>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Mensagem</label>
                 <textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
-              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
-                Enviar pelo WhatsApp
-              </button>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Enviar pelo WhatsApp</button>
             </form>
           </div>
-
           <div id="cp-1" style={{ paddingTop: '1.4rem', display: 'none' }}>
             <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imóvel à venda? Preencha o formulário e Jussara entrará em contato.</p>
             <form onSubmit={enviarCaptacao} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -598,8 +612,7 @@ export default function Home() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                   <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Zona</label>
                   <select id="cap-zona" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                    <option value="urbano">Urbano</option>
-                    <option value="rural">Rural</option>
+                    <option value="urbano">Urbano</option><option value="rural">Rural</option>
                   </select>
                 </div>
               </div>
@@ -615,12 +628,9 @@ export default function Home() {
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label>
                 <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem, diferenciais..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
-              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
-                Enviar pelo WhatsApp
-              </button>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Enviar pelo WhatsApp</button>
             </form>
           </div>
-
           <div id="cp-2" style={{ paddingTop: '1.4rem', display: 'none' }}>
             <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Fale com nossa advogada especialista em direito imobiliário.</p>
             <form onSubmit={enviarJuridico} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -635,19 +645,14 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Serviço</label>
                 <select id="j-servico" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                  <option>Contratos imobiliários</option>
-                  <option>Regularização de imóveis</option>
-                  <option>Usucapião</option>
-                  <option>Outro</option>
+                  <option>Contratos imobiliários</option><option>Regularização de imóveis</option><option>Usucapião</option><option>Outro</option>
                 </select>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descreva sua situação</label>
                 <textarea id="j-msg" placeholder="Conte brevemente o que você precisa..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
-              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
-                Falar com o setor jurídico
-              </button>
+              <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Falar com o setor jurídico</button>
             </form>
           </div>
         </div>
@@ -683,8 +688,8 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
-        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>© 2026 • Campo Belo — Todos os direitos reservados</span>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende</span>
+        <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>{config.footer_texto || '© 2026 • Campo Belo — Todos os direitos reservados'}</span>
+        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>{config.footer_creci || 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende'}</span>
       </footer>
 
       {/* WPP FLOAT */}
