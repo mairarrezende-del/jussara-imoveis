@@ -207,6 +207,12 @@ export default function Home() {
         @media (max-width: 768px) {
           nav > div:last-child { display: none !important; }
           #inicio { height: 220px !important; }
+          section { display: block !important; padding: 2.5rem 5vw !important; }
+          section > div { display: block !important; }
+          #busca > div > div { display: block !important; }
+          #busca > div > div > div { margin-bottom: 0.75rem; }
+          #juridico > div:last-child { display: block !important; text-align: center; }
+          #juridico > div:last-child > a { margin-top: 1rem; display: inline-block; }
         }
       `}</style>
       {/* LIGHTBOX */}
