@@ -432,13 +432,33 @@ export default function AdminPage() {
                     <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP, HEIC • Múltiplas fotos permitidas</p>
                   </div>
                   {editando.fotos && editando.fotos.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.75rem' }}>
-                      {editando.fotos.map((url, i) => (
-                        <div key={i} style={{ position: 'relative' }}>
-                          <img src={url} alt={`Foto ${i + 1}`} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 1 }} />
-                          <button onClick={() => setEditando({ ...editando, fotos: editando.fotos.filter((_, j) => j !== i) })} style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(200,50,50,0.8)', border: 'none', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                        </div>
-                      ))}
+                    <div>
+                      <p style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0.75rem 0 0.5rem' }}>Arraste para reordenar</p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                        {editando.fotos.map((url, i) => (
+                          <div
+                            key={i}
+                            draggable
+                            onDragStart={e => e.dataTransfer.setData('text/plain', String(i))}
+                            onDragOver={e => e.preventDefault()}
+                            onDrop={e => {
+                              e.preventDefault()
+                              const de = Number(e.dataTransfer.getData('text/plain'))
+                              const para = i
+                              if (de === para) return
+                              const novas = [...editando.fotos]
+                              const [movida] = novas.splice(de, 1)
+                              novas.splice(para, 0, movida)
+                              setEditando({ ...editando, fotos: novas })
+                            }}
+                            style={{ position: 'relative', cursor: 'grab' }}
+                          >
+                            <img src={url} alt={`Foto ${i + 1}`} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 1, pointerEvents: 'none' }} />
+                            <div style={{ position: 'absolute', top: 2, left: 4, background: 'rgba(4,49,55,0.75)', color: 'rgba(223,192,120,0.9)', fontSize: '0.6rem', fontWeight: 600, padding: '1px 5px', borderRadius: 1 }}>{i + 1}</div>
+                            <button onClick={() => setEditando({ ...editando, fotos: editando.fotos.filter((_, j) => j !== i) })} style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(200,50,50,0.8)', border: 'none', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
