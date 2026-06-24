@@ -198,7 +198,7 @@ export default function AdminPage() {
     setSalvando(true)
     try {
       for (const [chave, valor] of Object.entries(config)) {
-        const { data } = await supabase.from('configuracoes').select('id').eq('chave', chave).single()
+        const { data } = await supabase.from('configuracoes').select('id').eq('chave', chave).maybeSingle()
         if (data) {
           await supabase.from('configuracoes').update({ valor }).eq('chave', chave)
         } else {
