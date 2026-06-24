@@ -93,7 +93,7 @@ export default function ImovelPage() {
       <div style={{ background: s.verde, position: 'relative' }}>
         {imovel.fotos && imovel.fotos.length > 0 ? (
           <div style={{ position: 'relative' }}>
-            <div style={{ width: '100%', height: '65vh', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ width: '100%', height: '80vh', overflow: 'hidden', position: 'relative' }}>
               <img src={imovel.fotos[fotoIdx]} alt={imovel.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.9) 0%, rgba(4,49,55,0.3) 60%, transparent 100%)', padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', height: '40%' }}>
                 <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 80, width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
