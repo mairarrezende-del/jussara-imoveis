@@ -457,7 +457,7 @@ export default function Home() {
               <div key={im.id} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s', cursor: 'pointer' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 14px 44px rgba(4,49,55,0.11)' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '' }}>
-                <div onClick={() => abrirLb(im)} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <Link href={`/imoveis/${im.slug}`} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
                   {im.fotos && im.fotos.length > 0 ? (
                     <img src={im.fotos[0]} alt={im.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                   ) : (
@@ -469,7 +469,7 @@ export default function Home() {
                       <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
                     </div>
                   )}
-                </div>
+                </Link>
                 <div style={{ padding: '1.15rem 1.4rem 1.4rem' }}>
                   <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.65rem', flexWrap: 'wrap' }}>
                     {[TIPO_LABEL[im.tipo] || im.tipo, im.zona === 'rural' ? 'Rural' : 'Urbano', im.cidade].map(b => (
