@@ -203,6 +203,12 @@ export default function Home() {
 
   return (
     <>
+      <style>{`
+        @media (max-width: 768px) {
+          nav > div:last-child { display: none !important; }
+          #inicio { height: 220px !important; }
+        }
+      `}</style>
       {/* LIGHTBOX */}
       {lbOpen && lbImovel && (
         <div onClick={fecharLb} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(2,10,12,0.96)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
