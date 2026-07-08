@@ -319,10 +319,10 @@ export default function Home() {
           </div>
           <div style={{ display: 'flex', gap: '2rem', marginTop: '3rem', paddingTop: '1.75rem', borderTop: `1px solid ${s.borda}`, flexWrap: 'wrap' }}>
             {[
-              [config.hero_stat1_num || '+ 200', config.hero_stat1_label || 'Negócios realizados'],
-              [config.hero_stat2_num || '15 +', config.hero_stat2_label || 'Anos de experiência'],
-              [config.hero_stat3_num || '100%', config.hero_stat3_label || 'Compromisso'],
-            ].map(([n, l]) => (
+              [config.hero_stat1_num, config.hero_stat1_label],
+              [config.hero_stat2_num, config.hero_stat2_label],
+              [config.hero_stat3_num, config.hero_stat3_label],
+            ].filter(([n]) => n && n.trim() !== '').map(([n, l]) => (
               <div key={l}>
                 <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '2rem', color: s.ouro, lineHeight: 1, display: 'block' }}>{n}</span>
                 <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', display: 'block', marginTop: '0.28rem' }}>{l}</span>
@@ -396,7 +396,8 @@ export default function Home() {
       <section id="sobre" style={{ background: s.off, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'center', padding: '5.5rem 7vw' }}>
         <div style={{ position: 'relative' }}>
           <div style={{ aspectRatio: '4/5', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>
+            {config.sobre_foto && <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, zIndex: 1 }} />}
+            {!config.sobre_foto && <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.95) 0%, transparent 100%)', padding: '1.5rem 1.25rem 1rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 70, width: 'auto', objectFit: 'contain' }} />
             </div>
