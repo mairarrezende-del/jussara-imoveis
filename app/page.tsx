@@ -269,7 +269,7 @@ export default function Home() {
                   <p style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>Adicione sua foto pelo painel admin</p>
                 </div>
             }
-            <div style={{ position: 'absolute', bottom: '1.25rem', left: '-1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1, zIndex: 2 }}>
+            <div style={{ position: 'absolute', bottom: '1.25rem', left: '1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1, zIndex: 2 }}>
               <strong style={{ fontSize: '0.82rem', fontWeight: 600, display: 'block' }}>CRECI 52583</strong>
               <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Registro Ativo • MG</span>
             </div>
