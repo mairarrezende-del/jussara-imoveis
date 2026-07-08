@@ -49,8 +49,25 @@ const imovelVazio: Imovel = {
 
 const GRUPOS_TEXTO = [
   { grupo: '🏠 Navegação', campos: [{ chave: 'nav_nome', label: 'Nome no menu' }, { chave: 'nav_subtitulo', label: 'Subtítulo no menu' }] },
-  { grupo: '🌟 Seção Principal (Hero)', campos: [{ chave: 'hero_tag', label: 'Tag acima do título' }, { chave: 'hero_titulo', label: 'Título principal', grande: true }, { chave: 'hero_subtitulo', label: 'Subtítulo / descrição', grande: true }, { chave: 'hero_stat1_num', label: 'Estatística 1 — número (deixe vazio para ocultar)' }, { chave: 'hero_stat1_label', label: 'Estatística 1 — label' }, { chave: 'hero_stat2_num', label: 'Estatística 2 — número (deixe vazio para ocultar)' }, { chave: 'hero_stat2_label', label: 'Estatística 2 — label' }, { chave: 'hero_stat3_num', label: 'Estatística 3 — número (deixe vazio para ocultar)' }, { chave: 'hero_stat3_label', label: 'Estatística 3 — label' }] },
-  { grupo: '👤 Seção Sobre', campos: [{ chave: 'sobre_titulo', label: 'Nome da corretora' }, { chave: 'sobre_anos', label: 'Anos de experiência (destaque)' }, { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true }, { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true }, { chave: 'sobre_foto', label: 'Foto da corretora', foto: true }] },
+  { grupo: '🌟 Seção Principal (Hero)', campos: [
+    { chave: 'hero_tag', label: 'Tag acima do título' },
+    { chave: 'hero_titulo', label: 'Título principal', grande: true },
+    { chave: 'hero_subtitulo', label: 'Subtítulo / descrição', grande: true },
+    { chave: 'hero_stat1_num', label: 'Estatística 1 — número (deixe vazio para ocultar)' },
+    { chave: 'hero_stat1_label', label: 'Estatística 1 — label' },
+    { chave: 'hero_stat2_num', label: 'Estatística 2 — número (deixe vazio para ocultar)' },
+    { chave: 'hero_stat2_label', label: 'Estatística 2 — label' },
+    { chave: 'hero_stat3_num', label: 'Estatística 3 — número (deixe vazio para ocultar)' },
+    { chave: 'hero_stat3_label', label: 'Estatística 3 — label' },
+    { chave: 'hero_foto', label: 'Foto da seção principal (fundo verde)', heroFoto: true },
+  ]},
+  { grupo: '👤 Seção Sobre', campos: [
+    { chave: 'sobre_titulo', label: 'Nome da corretora' },
+    { chave: 'sobre_anos', label: 'Anos de experiência (deixe vazio para ocultar)' },
+    { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true },
+    { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true },
+    { chave: 'sobre_foto', label: 'Foto da seção Sobre (fundo claro)', foto: true },
+  ]},
   { grupo: '⚖️ Seção Jurídico', campos: [{ chave: 'juridico_titulo', label: 'Título da seção' }, { chave: 'juridico_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'juridico_advogada', label: 'Nome da advogada' }, { chave: 'juridico_oab', label: 'Descrição / OAB' }] },
   { grupo: '📬 Seção Contato', campos: [{ chave: 'contato_titulo', label: 'Título' }, { chave: 'contato_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'localizacao', label: 'Localização' }] },
   { grupo: '📱 Redes Sociais', campos: [{ chave: 'whatsapp', label: 'WhatsApp (só números, com DDI)' }, { chave: 'instagram', label: 'Instagram (só o @, sem @)' }, { chave: 'facebook', label: 'Facebook (URL completa)' }] },
@@ -198,7 +215,7 @@ export default function AdminPage() {
       } catch { erros++ }
     }
     setSalvando(false)
-    setMsg(erros > 0 ? `❌ ${erros} erro(s) ao salvar` : '✅ Configurações salvas! Recarregue o site para ver as mudanças.')
+    setMsg(erros > 0 ? `❌ ${erros} erro(s) ao salvar` : '✅ Configurações salvas! Recarregue o site.')
     setTimeout(() => setMsg(''), 4000)
   }
 
@@ -230,13 +247,25 @@ export default function AdminPage() {
     setTimeout(() => setMsg(''), 4000)
   }
 
-  async function handleFotoCorretora(file: File) {
+  async function handleFotoHero(file: File) {
     setSalvando(true)
-    setMsg('⏳ Enviando foto...')
+    setMsg('⏳ Enviando foto do Hero...')
+    try {
+      const url = await uploadFoto(file, 'imovel')
+      setConfig(c => ({ ...c, hero_foto: url }))
+      setMsg('✅ Foto do Hero carregada! Clique em Salvar todos os textos.')
+    } catch { setMsg('❌ Erro ao enviar foto') }
+    setSalvando(false)
+    setTimeout(() => setMsg(''), 3000)
+  }
+
+  async function handleFotoSobre(file: File) {
+    setSalvando(true)
+    setMsg('⏳ Enviando foto do Sobre...')
     try {
       const url = await uploadFoto(file, 'imovel')
       setConfig(c => ({ ...c, sobre_foto: url }))
-      setMsg('✅ Foto carregada! Clique em Salvar todos os textos.')
+      setMsg('✅ Foto do Sobre carregada! Clique em Salvar todos os textos.')
     } catch { setMsg('❌ Erro ao enviar foto') }
     setSalvando(false)
     setTimeout(() => setMsg(''), 3000)
@@ -322,7 +351,6 @@ export default function AdminPage() {
 
       <div style={{ padding: '2rem 3vw' }}>
 
-        {/* ABA IMÓVEIS */}
         {aba === 'imoveis' && !editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
@@ -356,7 +384,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* FORMULÁRIO IMÓVEL */}
         {(aba === 'novo' || aba === 'editar') && editando && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -438,14 +465,12 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ABA CARROSSEL */}
         {aba === 'carrossel' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Carrossel da página inicial</h2>
               <button onClick={() => setSlides([...slides, { imagem: '', legenda: 'Novo slide', subtitulo: '', ordem: slides.length, ativo: true }])} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo slide</button>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginBottom: '1.5rem' }}>Recomendado: imagens 1400 × 500 px, formato JPG ou PNG.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {slides.map((sl, idx) => (
                 <div key={sl.id || idx} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.25rem' }}>
@@ -472,12 +497,11 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
-              {slides.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}><p>Nenhum slide. Clique em "+ Novo slide".</p></div>}
+              {slides.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}><p>Nenhum slide.</p></div>}
             </div>
           </div>
         )}
 
-        {/* ABA TEXTOS */}
         {aba === 'textos' && (
           <div style={{ maxWidth: 800 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
@@ -492,12 +516,20 @@ export default function AdminPage() {
                 {grupo.campos.map(f => (
                   <div key={f.chave} style={campo}>
                     <label style={lbl}>{f.label}</label>
-                    {(f as any).foto ? (
+                    {(f as any).heroFoto ? (
                       <div>
-                        {config.sobre_foto && <img src={config.sobre_foto} alt="Foto corretora" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} />}
+                        {config.hero_foto && <img src={config.hero_foto} alt="Foto Hero" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} />}
                         <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1rem', textAlign: 'center', position: 'relative' }}>
-                          <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleFotoCorretora(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
-                          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>📸 {config.sobre_foto ? 'Clique para trocar a foto' : 'Clique para enviar foto da corretora'}</p>
+                          <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleFotoHero(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>📸 {config.hero_foto ? 'Trocar foto do fundo verde' : 'Enviar foto do fundo verde'}</p>
+                        </div>
+                      </div>
+                    ) : (f as any).foto ? (
+                      <div>
+                        {config.sobre_foto && <img src={config.sobre_foto} alt="Foto Sobre" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 1, marginBottom: '0.5rem' }} />}
+                        <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1rem', textAlign: 'center', position: 'relative' }}>
+                          <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleFotoSobre(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>📸 {config.sobre_foto ? 'Trocar foto do fundo claro' : 'Enviar foto do fundo claro'}</p>
                         </div>
                       </div>
                     ) : (f as any).grande ? (
@@ -515,7 +547,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ABA VISUAL */}
         {aba === 'configuracoes' && (
           <div style={{ maxWidth: 700 }}>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400, marginBottom: '2rem' }}>⚙️ Configurações visuais</h2>
@@ -546,27 +577,24 @@ export default function AdminPage() {
                   <select style={{ ...inp(), background: s.verde }} value={config.fonte_titulo || 'Cormorant Garamond'} onChange={e => setConfig(c => ({ ...c, fonte_titulo: e.target.value }))}>
                     {FONTES_TITULO.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
-                  <p style={{ fontFamily: (config.fonte_titulo || 'Cormorant Garamond') + ', serif', fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Jussara Ribeiro</p>
                 </div>
                 <div style={campo}>
                   <label style={lbl}>Fonte do texto geral</label>
                   <select style={{ ...inp(), background: s.verde }} value={config.fonte_texto || 'Open Sans'} onChange={e => setConfig(c => ({ ...c, fonte_texto: e.target.value }))}>
                     {FONTES_TEXTO.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
-                  <p style={{ fontFamily: (config.fonte_texto || 'Open Sans') + ', sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Prévia: Compra e venda de imóveis</p>
                 </div>
               </div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🎬 Vídeo da Cidade</p>
               <div style={campo}>
-                <label style={lbl}>Opção de vídeo</label>
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
                     <input type="radio" name="video_tipo" checked={config.video_cidade_tipo !== 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'link' }))} /> Link (YouTube)
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
-                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo === 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'upload' }))} /> Upload de arquivo
+                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo === 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'upload' }))} /> Upload
                   </label>
                 </div>
                 {config.video_cidade_tipo === 'upload' ? (
@@ -574,15 +602,11 @@ export default function AdminPage() {
                     <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative', marginBottom: '0.75rem' }}>
                       <input type="file" accept="video/*" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                       <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>🎬 Clique para fazer upload do vídeo</p>
-                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>MP4, MOV, WebM • Recomendado até 50MB</p>
                     </div>
-                    {config.video_cidade && config.video_cidade_tipo === 'upload' && <video src={config.video_cidade} controls style={{ width: '100%', borderRadius: 1, maxHeight: 200 }} />}
+                    {config.video_cidade && <video src={config.video_cidade} controls style={{ width: '100%', borderRadius: 1, maxHeight: 200 }} />}
                   </div>
                 ) : (
-                  <div>
-                    <input style={inp()} value={config.video_cidade || ''} onChange={e => setConfig(c => ({ ...c, video_cidade: e.target.value, video_cidade_tipo: 'link' }))} placeholder="https://www.youtube.com/watch?v=..." />
-                    {config.video_cidade && config.video_cidade_tipo !== 'upload' && <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.5rem' }}>✅ Link configurado</p>}
-                  </div>
+                  <input style={inp()} value={config.video_cidade || ''} onChange={e => setConfig(c => ({ ...c, video_cidade: e.target.value, video_cidade_tipo: 'link' }))} placeholder="https://www.youtube.com/watch?v=..." />
                 )}
               </div>
             </div>
