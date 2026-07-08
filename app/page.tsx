@@ -330,8 +330,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '3rem 2.5rem 0' }}>
-          <div style={{ width: '100%', maxWidth: 340, background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderBottom: 'none', borderRadius: '2px 2px 0 0', height: 480, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: '0' }}>
+          <div style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderBottom: 'none', borderRadius: '2px 2px 0 0', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
             {(config.hero_foto || config.sobre_foto)
               ? <img src={config.hero_foto || config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', position: 'absolute', inset: 0, borderRadius: 0 }} />
               : <div style={{ textAlign: 'center', color: 'rgba(223,192,120,0.35)', padding: '2rem' }}>
