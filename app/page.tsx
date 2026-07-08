@@ -38,6 +38,7 @@ const TIPO_LABEL: Record<string, string> = {
 }
 
 const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
+const LOGO_URL = 'https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png'
 
 function formatarPreco(preco: number): string {
   return preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -46,40 +47,11 @@ function formatarPreco(preco: number): string {
 export default function Home() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
-  const [config, setConfig] = useState<Config>({
-    cor_principal: '#043137',
-    cor_destaque: '#DFC078',
-    fonte_titulo: 'Cormorant Garamond',
-    fonte_texto: 'Open Sans',
-    hero_titulo: 'Realizando o sonho de cada família com confiança',
-    hero_subtitulo: 'Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.',
-    hero_stat1_num: '+ 200', hero_stat1_label: 'Negócios realizados',
-    hero_stat2_num: '15 +', hero_stat2_label: 'Anos de experiência',
-    hero_stat3_num: '100%', hero_stat3_label: 'Compromisso',
-    sobre_titulo: 'Jussara Ribeiro',
-    sobre_anos: '15+',
-    sobre_p1: 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.',
-    sobre_p2: 'Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.',
-    juridico_titulo: 'Assessoria Jurídica Imobiliária',
-    juridico_subtitulo: 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.',
-    juridico_advogada: 'Dra. Maíra Ribeiro de Rezende',
-    juridico_oab: 'Advogada • OAB/MG • Especialista em Direito Imobiliário',
-    contato_titulo: 'Vamos encontrar o imóvel ideal?',
-    contato_subtitulo: 'Entre em contato para agendar uma visita ou solicitar avaliação gratuita.',
-    localizacao: 'Campo Belo • MG e região',
-    whatsapp: '5535997461643',
-    instagram: 'jussara_ribeirocorretora',
-    facebook: 'https://www.facebook.com/jussararibeirocorretora',
-    footer_texto: '© 2026 • Campo Belo — Todos os direitos reservados',
-    footer_creci: 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende',
-  })
+  const [config, setConfig] = useState<Config>({})
   const [filtro, setFiltro] = useState('')
-  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '', vmin: '', vmax: '' })
+  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '' })
   const [bairros, setBairros] = useState<string[]>([])
   const [carIdx, setCarIdx] = useState(0)
-  const [lbOpen, setLbOpen] = useState(false)
-  const [lbImovel, setLbImovel] = useState<Imovel | null>(null)
-  const [lbFotoIdx, setLbFotoIdx] = useState(0)
   const carTimer = useRef<NodeJS.Timeout | null>(null)
   const WPP = config.whatsapp || '5535997461643'
 
@@ -119,7 +91,7 @@ export default function Home() {
     if (data) {
       const cfg: Config = {}
       data.forEach((row: { chave: string; valor: string }) => { cfg[row.chave] = row.valor })
-      setConfig(prev => ({ ...prev, ...cfg }))
+      setConfig(cfg)
     }
   }
 
@@ -127,16 +99,6 @@ export default function Home() {
     if (carTimer.current) clearInterval(carTimer.current)
     setCarIdx(i => ((i + dir) + slides.length) % slides.length)
     carTimer.current = setInterval(() => setCarIdx(i => (i + 1) % slides.length), 5000)
-  }
-
-  function abrirLb(im: Imovel, fotoIdx = 0) {
-    setLbImovel(im); setLbFotoIdx(fotoIdx); setLbOpen(true)
-    document.body.style.overflow = 'hidden'
-  }
-
-  function fecharLb() {
-    setLbOpen(false); setLbImovel(null)
-    document.body.style.overflow = ''
   }
 
   function enviarContato(e: React.FormEvent<HTMLFormElement>) {
@@ -177,7 +139,6 @@ export default function Home() {
     if (busca.tipo && im.tipo !== busca.tipo) return false
     if (busca.zona && im.zona !== busca.zona) return false
     if (busca.bairro && im.bairro !== busca.bairro) return false
-    if (busca.vmax && im.preco > Number(busca.vmax)) return false
     return true
   })
 
@@ -188,7 +149,7 @@ export default function Home() {
     branco: '#FFFFFF',
     off: '#F8F6F2',
     cinza: '#7A7A7A',
-    borda: `rgba(223,192,120,0.22)`,
+    borda: 'rgba(223,192,120,0.22)',
     ftitulo: config.fonte_titulo || 'Cormorant Garamond',
     ftexto: config.fonte_texto || 'Open Sans',
   }
@@ -215,38 +176,11 @@ export default function Home() {
           #juridico > div:last-child > a { margin-top: 1rem; display: inline-block; }
         }
       `}</style>
-      {/* LIGHTBOX */}
-      {lbOpen && lbImovel && (
-        <div onClick={fecharLb} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(2,10,12,0.96)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <button onClick={fecharLb} style={{ position: 'fixed', top: '1rem', right: '1.5rem', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 40, height: 40, borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-          {lbImovel.fotos && lbImovel.fotos.length > 0 ? (
-            <div style={{ position: 'relative', display: 'inline-block' }} onClick={e => e.stopPropagation()}>
-              <img src={lbImovel.fotos[lbFotoIdx]} alt={lbImovel.titulo} style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 2, display: 'block' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.9) 0%, rgba(4,49,55,0.3) 60%, transparent 100%)', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', height: '40%', borderRadius: '0 0 2px 2px' }}>
-                <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 160, width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
-              </div>
-            </div>
-          ) : (
-            <div style={{ color: s.ouro, opacity: 0.4, textAlign: 'center' }}>Sem foto disponível</div>
-          )}
-          {lbImovel.fotos && lbImovel.fotos.length > 1 && (
-            <>
-              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.max(0, i - 1)) }} style={{ position: 'fixed', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === 0 ? 0.2 : 1 }}>‹</button>
-              <button onClick={e => { e.stopPropagation(); setLbFotoIdx(i => Math.min((lbImovel.fotos?.length || 1) - 1, i + 1)) }} style={{ position: 'fixed', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(223,192,120,0.1)', border: '1px solid rgba(223,192,120,0.3)', color: s.ouro, width: 50, height: 50, borderRadius: '50%', fontSize: '1.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: lbFotoIdx === (lbImovel.fotos?.length || 1) - 1 ? 0.2 : 1 }}>›</button>
-            </>
-          )}
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <p style={{ fontFamily: s.ftitulo + ', serif', color: s.branco, fontSize: '1rem' }}>{lbImovel.titulo}</p>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{lbImovel.bairro} • {lbImovel.cidade}</p>
-            {lbImovel.fotos && <p style={{ fontSize: '0.65rem', color: 'rgba(223,192,120,0.5)', marginTop: '0.3rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{lbFotoIdx + 1} de {lbImovel.fotos.length}</p>}
-          </div>
-        </div>
-      )}
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro Imóveis" style={{ height: 88, width: 'auto', objectFit: 'contain' }} />
+          <img src={LOGO_URL} alt="Jussara Ribeiro Imóveis" style={{ height: 88, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
@@ -254,9 +188,6 @@ export default function Home() {
               {['Início', 'Sobre', 'Imóveis', 'Jurídico', 'Contato'][i]}
             </a>
           ))}
-          <button onClick={() => document.getElementById('busca')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.6)', padding: '0.38rem 0.9rem', borderRadius: 1, fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
-            🔍 Buscar
-          </button>
           <a href={`https://wa.me/${WPP}`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: s.ouro, textDecoration: 'none', fontSize: '0.72rem' }}>
             <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
               <small style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)' }}>Fale conosco</small>
@@ -275,7 +206,7 @@ export default function Home() {
                 <div key={sl.id} style={{ minWidth: '100%', height: '100%', position: 'relative', flexShrink: 0 }}>
                   {sl.imagem && <img src={sl.imagem} alt={sl.legenda} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />}
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(4,49,55,0.1) 0%, rgba(4,49,55,0.6) 100%)' }} />
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 3rem', background: 'linear-gradient(to top, rgba(4,49,55,0.8), transparent)' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 3rem' }}>
                     <strong style={{ fontFamily: s.ftitulo + ', serif', color: s.branco, fontSize: '1.1rem', display: 'block' }}>{sl.legenda}</strong>
                     <span style={{ fontSize: '0.75rem', color: 'rgba(223,192,120,0.8)', marginTop: '0.2rem', display: 'block' }}>{sl.subtitulo}</span>
                   </div>
@@ -291,7 +222,7 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'rgba(223,192,120,0.3)' }}>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(223,192,120,0.3)' }}>
             <p style={{ fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Adicione imagens pelo painel admin</p>
           </div>
         )}
@@ -333,13 +264,12 @@ export default function Home() {
         <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: '0' }}>
           <div style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderBottom: 'none', borderRadius: '2px 2px 0 0', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
             {config.hero_foto
-              ? <img src={config.hero_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', position: 'absolute', inset: 0, borderRadius: 0 }} />
+              ? <img src={config.hero_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', position: 'absolute', inset: 0 }} />
               : <div style={{ textAlign: 'center', color: 'rgba(223,192,120,0.35)', padding: '2rem' }}>
                   <p style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>Adicione sua foto pelo painel admin</p>
                 </div>
             }
-
-            <div style={{ position: 'absolute', bottom: '1.25rem', left: '-1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1 }}>
+            <div style={{ position: 'absolute', bottom: '1.25rem', left: '-1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1, zIndex: 2 }}>
               <strong style={{ fontSize: '0.82rem', fontWeight: 600, display: 'block' }}>CRECI 52583</strong>
               <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Registro Ativo • MG</span>
             </div>
@@ -400,14 +330,16 @@ export default function Home() {
       <section id="sobre" style={{ background: s.off, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'center', padding: '5.5rem 7vw' }}>
         <div style={{ position: 'relative' }}>
           <div style={{ aspectRatio: '3/4', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            {config.sobre_foto && <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', position: 'absolute', inset: 0, zIndex: 1 }} />}
-            {!config.sobre_foto && <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>}
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.95) 0%, transparent 100%)', padding: '1.5rem 1.25rem 1rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-              <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 70, width: 'auto', objectFit: 'contain' }} />
+            {config.sobre_foto
+              ? <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', position: 'absolute', inset: 0 }} />
+              : <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>
+            }
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.85) 0%, transparent 100%)', padding: '1.5rem 1.25rem 1rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', height: '35%', zIndex: 2 }}>
+              <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 60, width: 'auto', objectFit: 'contain' }} />
             </div>
           </div>
           {config.sobre_anos && (
-            <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 2 }}>
+            <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 3 }}>
               <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>{config.sobre_anos}</strong>
               <span style={{ fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Anos no mercado</span>
             </div>
@@ -419,10 +351,10 @@ export default function Home() {
           </span>
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>{config.sobre_titulo || 'Jussara Ribeiro'}</h2>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região, especializada em compra e venda de imóveis residenciais e comerciais.'}
+            {config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região.'}
           </p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança. Cada negociação é tratada com máxima atenção e responsabilidade.'}
+            {config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança.'}
           </p>
           {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
@@ -461,7 +393,7 @@ export default function Home() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '1.6rem' }}>
             {imoveisFiltrados.map(im => (
-              <div key={im.id} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s', cursor: 'pointer' }}
+              <div key={im.id} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 14px 44px rgba(4,49,55,0.11)' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '' }}>
                 <Link href={`/imoveis/${im.slug}`} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
@@ -473,7 +405,7 @@ export default function Home() {
                   <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
                   {im.fotos && im.fotos.length > 0 && (
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 3, padding: '0.6rem', background: 'linear-gradient(to top, rgba(4,49,55,0.92) 0%, rgba(4,49,55,0.4) 70%, transparent 100%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', height: '45%' }}>
-                      <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
+                      <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
                     </div>
                   )}
                 </Link>
@@ -512,7 +444,7 @@ export default function Home() {
           </span>
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde, marginBottom: '1rem' }}>{config.juridico_titulo || 'Assessoria Jurídica Imobiliária'}</h2>
           <p style={{ fontSize: '0.9rem', color: s.cinza, lineHeight: 1.85, maxWidth: 620, margin: '0 auto', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.juridico_subtitulo || 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado para tornar sua negociação mais segura.'}
+            {config.juridico_subtitulo || 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado.'}
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
@@ -565,15 +497,11 @@ export default function Home() {
               </div>
             </div>
           ))}
-          <div style={{ marginTop: '2rem', paddingTop: '1.35rem', borderTop: `1px solid rgba(223,192,120,0.12)`, fontSize: '0.68rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em', lineHeight: 1.8 }}>
-            {config.footer_creci || 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende'}<br />
-            Registros profissionais ativos • Compra e Venda
-          </div>
         </div>
         <div>
           <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid rgba(223,192,120,0.18)` }}>
-            {['Fale comigo', 'Quero vender meu imóvel', 'Assessoria jurídica'].map((label, i) => (
-              <button key={label} id={`tab-${i}`} onClick={() => {
+            {['Fale comigo', 'Quero vender', 'Assessoria jurídica'].map((label, i) => (
+              <button key={label} onClick={() => {
                 document.getElementById('cp-0')!.style.display = i === 0 ? 'block' : 'none'
                 document.getElementById('cp-1')!.style.display = i === 1 ? 'block' : 'none'
                 document.getElementById('cp-2')!.style.display = i === 2 ? 'block' : 'none'
@@ -586,12 +514,14 @@ export default function Home() {
           <div id="cp-0" style={{ paddingTop: '1.4rem' }}>
             <form onSubmit={enviarContato} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                {[{ id: 'f-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text', required: true }, { id: 'f-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel', required: false }].map(f => (
-                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} type={f.type} placeholder={f.placeholder} required={f.required} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
+                  <input id="f-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
+                  <input id="f-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>E-mail</label>
@@ -599,7 +529,7 @@ export default function Home() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label>
-                <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }}>
+                <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
                   <option>Comprar imóvel</option><option>Vender imóvel</option><option>Avaliação de imóvel</option><option>Assessoria jurídica imobiliária</option><option>Outro</option>
                 </select>
               </div>
@@ -611,19 +541,20 @@ export default function Home() {
             </form>
           </div>
           <div id="cp-1" style={{ paddingTop: '1.4rem', display: 'none' }}>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Quer colocar seu imóvel à venda? Preencha o formulário e Jussara entrará em contato.</p>
             <form onSubmit={enviarCaptacao} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                {[{ id: 'cap-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'cap-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
-                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} type={f.type} placeholder={f.placeholder} required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
+                  <input id="cap-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
+                  <input id="cap-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo do imóvel</label>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo</label>
                   <select id="cap-tipo" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
                     {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
@@ -645,21 +576,22 @@ export default function Home() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label>
-                <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem, diferenciais..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
+                <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
               </div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Enviar pelo WhatsApp</button>
             </form>
           </div>
           <div id="cp-2" style={{ paddingTop: '1.4rem', display: 'none' }}>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.42)', marginBottom: '1.1rem', lineHeight: 1.7, fontWeight: 300 }}>Fale com nossa advogada especialista em direito imobiliário.</p>
             <form onSubmit={enviarJuridico} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                {[{ id: 'j-nome', label: 'Seu nome', placeholder: 'Nome completo', type: 'text' }, { id: 'j-tel', label: 'Telefone', placeholder: '(00) 00000-0000', type: 'tel' }].map(f => (
-                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} type={f.type} placeholder={f.placeholder} required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
+                  <input id="j-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
+                  <input id="j-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
+                </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Serviço</label>
@@ -677,29 +609,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VÍDEO DA CIDADE */}
+      {/* VÍDEO */}
       {config.video_cidade && (
         <section style={{ background: '#021e22', padding: '0', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ textAlign: 'center', padding: '2.5rem 5vw 1.5rem', background: 'linear-gradient(to bottom, #021e22, transparent)', position: 'relative', zIndex: 2 }}>
+          <div style={{ textAlign: 'center', padding: '2.5rem 5vw 1.5rem' }}>
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
               Campo Belo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
             </span>
             <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.4rem, 2vw, 2rem)', fontWeight: 400, color: s.branco, marginTop: '0.5rem' }}>Nossa cidade</h2>
           </div>
-          <div style={{ width: '100%', maxHeight: 480, overflow: 'hidden', position: 'relative' }}>
+          <div style={{ width: '100%', maxHeight: 480, overflow: 'hidden' }}>
             {config.video_cidade_tipo === 'upload' ? (
               <video src={config.video_cidade} autoPlay muted loop playsInline style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }} />
             ) : (
               <iframe
-                src={config.video_cidade.includes('youtube') || config.video_cidade.includes('youtu.be')
-                  ? `https://www.youtube.com/embed/${config.video_cidade.split('v=')[1]?.split('&')[0] || config.video_cidade.split('youtu.be/')[1]}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0`
-                  : config.video_cidade}
+                src={`https://www.youtube.com/embed/${config.video_cidade.split('v=')[1]?.split('&')[0] || config.video_cidade.split('youtu.be/')[1]}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0`}
                 style={{ width: '100%', height: 480, border: 'none', display: 'block' }}
                 allow="autoplay; encrypted-media"
                 allowFullScreen
               />
             )}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(2,30,34,0.3) 0%, transparent 30%, transparent 70%, rgba(2,30,34,0.5) 100%)', pointerEvents: 'none' }} />
           </div>
         </section>
       )}
