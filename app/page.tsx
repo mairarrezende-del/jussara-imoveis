@@ -332,8 +332,8 @@ export default function Home() {
         </div>
         <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '3rem 2.5rem 0' }}>
           <div style={{ width: '100%', maxWidth: 340, background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderBottom: 'none', borderRadius: '2px 2px 0 0', minHeight: 420, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            {config.hero_foto
-              ? <img src={config.hero_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', position: 'absolute', inset: 0 }} />
+            {(config.hero_foto || config.sobre_foto)
+              ? <img src={config.hero_foto || config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', position: 'absolute', inset: 0 }} />
               : <div style={{ textAlign: 'center', color: 'rgba(223,192,120,0.35)', padding: '2rem' }}>
                   <p style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>Adicione sua foto pelo painel admin</p>
                 </div>
@@ -399,8 +399,8 @@ export default function Home() {
       {/* SOBRE */}
       <section id="sobre" style={{ background: s.off, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'center', padding: '5.5rem 7vw' }}>
         <div style={{ position: 'relative' }}>
-          <div style={{ aspectRatio: '4/5', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            {config.sobre_foto && <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, zIndex: 1 }} />}
+          <div style={{ aspectRatio: '3/4', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            {config.sobre_foto && <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', position: 'absolute', inset: 0, zIndex: 1 }} />}
             {!config.sobre_foto && <p style={{ fontSize: '0.68rem', color: 'rgba(223,192,120,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Adicione sua foto pelo painel admin</p>}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,49,55,0.95) 0%, transparent 100%)', padding: '1.5rem 1.25rem 1rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 70, width: 'auto', objectFit: 'contain' }} />
