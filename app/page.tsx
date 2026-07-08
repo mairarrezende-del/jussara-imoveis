@@ -332,9 +332,13 @@ export default function Home() {
         </div>
         <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '3rem 2.5rem 0' }}>
           <div style={{ width: '100%', maxWidth: 340, background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderBottom: 'none', borderRadius: '2px 2px 0 0', minHeight: 420, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <div style={{ textAlign: 'center', color: 'rgba(223,192,120,0.35)', padding: '2rem' }}>
-              <p style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>Adicione sua foto pelo painel admin</p>
-            </div>
+            {config.sobre_foto
+              ? <img src={config.sobre_foto} alt="Jussara Ribeiro" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', position: 'absolute', inset: 0 }} />
+              : <div style={{ textAlign: 'center', color: 'rgba(223,192,120,0.35)', padding: '2rem' }}>
+                  <p style={{ fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>Adicione sua foto pelo painel admin</p>
+                </div>
+            }
+
             <div style={{ position: 'absolute', bottom: '1.25rem', left: '-1rem', background: s.ouro, color: s.verde, padding: '0.65rem 1.1rem', borderRadius: 1 }}>
               <strong style={{ fontSize: '0.82rem', fontWeight: 600, display: 'block' }}>CRECI 52583</strong>
               <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Registro Ativo • MG</span>
@@ -402,10 +406,12 @@ export default function Home() {
               <img src="https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png" alt="Jussara Ribeiro" style={{ height: 70, width: 'auto', objectFit: 'contain' }} />
             </div>
           </div>
-          <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 2 }}>
-            <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>{config.sobre_anos || '15+'}</strong>
-            <span style={{ fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Anos no mercado</span>
-          </div>
+          {config.sobre_anos && (
+            <div style={{ position: 'absolute', bottom: '-1.4rem', right: '-1.4rem', background: s.ouro, color: s.verde, padding: '1.35rem 1.85rem', borderRadius: 1, zIndex: 2 }}>
+              <strong style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.75rem', display: 'block', lineHeight: 1, fontWeight: 400 }}>{config.sobre_anos}</strong>
+              <span style={{ fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Anos no mercado</span>
+            </div>
+          )}
         </div>
         <div>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
