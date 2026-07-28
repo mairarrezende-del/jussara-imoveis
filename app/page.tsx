@@ -52,6 +52,8 @@ export default function Home() {
   const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '' })
   const [bairros, setBairros] = useState<string[]>([])
   const [carIdx, setCarIdx] = useState(0)
+  const [menuAberto, setMenuAberto] = useState(false)
+  const [verTodos, setVerTodos] = useState(false)
   const carTimer = useRef<NodeJS.Timeout | null>(null)
   const WPP = config.whatsapp || '5535997461643'
 
@@ -142,6 +144,8 @@ export default function Home() {
     return true
   })
 
+  const imoveisExibidos = verTodos ? imoveisFiltrados : imoveisFiltrados.slice(0, 3)
+
   const s = {
     verde: config.cor_principal || '#043137',
     verdeM: '#065460',
@@ -170,29 +174,107 @@ export default function Home() {
           #inicio { height: 220px !important; }
           section { display: block !important; padding: 2.5rem 5vw !important; }
           section > div { display: block !important; }
-          #busca > div > div { display: block !important; }
-          #busca > div > div > div { margin-bottom: 0.75rem; }
           #juridico > div:last-child { display: block !important; text-align: center; }
-          #juridico > div:last-child > a { margin-top: 1rem; display: inline-block; }
         }
+        .menu-lateral { transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .menu-lateral.aberto { transform: translateX(0); }
+        .menu-overlay { opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+        .menu-overlay.aberto { opacity: 1; pointer-events: all; }
+        .btn-ouro { background: #DFC078; color: #043137; padding: 0.8rem 1.8rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 1px; transition: background 0.2s; text-decoration: none; display: inline-block; }
+        .btn-ouro:hover { background: #EDD49A; }
+        .btn-ghost { border: 1px solid rgba(223,192,120,0.4); color: rgba(255,255,255,0.75); padding: 0.8rem 1.8rem; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 1px; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .btn-ghost:hover { border-color: #DFC078; color: #DFC078; }
+        .divisor { width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #DFC078, transparent); }
       `}</style>
+
+      {/* OVERLAY */}
+      <div className={`menu-overlay${menuAberto ? ' aberto' : ''}`} onClick={() => setMenuAberto(false)} style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(2,10,12,0.7)' }} />
+
+      {/* MENU LATERAL */}
+      <div className={`menu-lateral${menuAberto ? ' aberto' : ''}`} style={{ position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 600, width: 340, background: s.verde, borderRight: `1px solid ${s.borda}`, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '1.5rem', borderBottom: `1px solid ${s.borda}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 60, width: 'auto', objectFit: 'contain' }} />
+          <button onClick={() => setMenuAberto(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+        </div>
+        <div style={{ padding: '1.5rem' }}>
+          <p style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '1rem' }}>Navegação</p>
+          {[['#inicio', '🏠 Início'], ['#sobre', '👤 Sobre mim'], ['#imoveis', '🏡 Imóveis'], ['#juridico', '⚖️ Assessoria Jurídica'], ['#contato', '📬 Contato']].map(([href, label]) => (
+            <a key={href} href={href} onClick={() => setMenuAberto(false)} style={{ display: 'block', padding: '0.75rem 0', fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', borderBottom: `1px solid rgba(223,192,120,0.08)`, fontFamily: s.ftexto + ', sans-serif' }}>{label}</a>
+          ))}
+        </div>
+        <div style={{ padding: '1.5rem', borderTop: `1px solid ${s.borda}` }}>
+          <p style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '1rem' }}>🔍 Buscar imóveis</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {[
+              { label: 'Palavra-chave', tipo: 'input', placeholder: 'Ex: casa 3 quartos...', onChange: (v: string) => setBusca(b => ({ ...b, texto: v })) },
+            ].map(f => (
+              <div key={f.label}>
+                <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>{f.label}</label>
+                <input placeholder={f.placeholder} value={busca.texto} onChange={e => f.onChange(e.target.value)} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
+              </div>
+            ))}
+            <div>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Cidade</label>
+              <select value={busca.cidade} onChange={e => setBusca(b => ({ ...b, cidade: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+                <option value="">Todas</option>
+                {CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Tipo</label>
+              <select value={busca.tipo} onChange={e => setBusca(b => ({ ...b, tipo: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+                <option value="">Todos</option>
+                {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Zona</label>
+              <select value={busca.zona} onChange={e => setBusca(b => ({ ...b, zona: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+                <option value="">Todas</option>
+                <option value="urbano">Urbano</option>
+                <option value="rural">Rural</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Bairro</label>
+              <select value={busca.bairro} onChange={e => setBusca(b => ({ ...b, bairro: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+                <option value="">Todos</option>
+                {bairros.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+            <button onClick={() => { setMenuAberto(false); setTimeout(() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' }), 400) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.75rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%', marginTop: '0.5rem' }}>
+              Buscar imóveis
+            </button>
+          </div>
+        </div>
+        <div style={{ padding: '1.5rem', borderTop: `1px solid ${s.borda}`, marginTop: 'auto' }}>
+          <p style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '1rem' }}>Contato rápido</p>
+          <a href={`https://wa.me/${WPP}`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: s.ouro, textDecoration: 'none', fontSize: '0.85rem', marginBottom: '0.75rem' }}>💬 (35) 99746-1643</a>
+          <a href={`https://www.instagram.com/${config.instagram || 'jussara_ribeirocorretora'}/`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.82rem' }}>📷 @{config.instagram || 'jussara_ribeirocorretora'}</a>
+        </div>
+      </div>
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
-        <a href="#inicio" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <img src={LOGO_URL} alt="Jussara Ribeiro Imóveis" style={{ height: 88, width: 'auto', objectFit: 'contain' }} />
-        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <button onClick={() => setMenuAberto(true)} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: s.ouro, width: 42, height: 42, borderRadius: 1, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5, flexShrink: 0 }}>
+            <span style={{ display: 'block', width: 18, height: 1.5, background: s.ouro, borderRadius: 1 }} />
+            <span style={{ display: 'block', width: 18, height: 1.5, background: s.ouro, borderRadius: 1 }} />
+            <span style={{ display: 'block', width: 18, height: 1.5, background: s.ouro, borderRadius: 1 }} />
+          </button>
+          <a href="#inicio" style={{ textDecoration: 'none' }}>
+            <img src={LOGO_URL} alt="Jussara Ribeiro Imóveis" style={{ height: 88, width: 'auto', objectFit: 'contain' }} />
+          </a>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {['#inicio', '#sobre', '#imoveis', '#juridico', '#contato'].map((href, i) => (
             <a key={href} href={href} style={{ fontSize: '0.82rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
               {['Início', 'Sobre', 'Imóveis', 'Jurídico', 'Contato'][i]}
             </a>
           ))}
-          <a href={`https://wa.me/${WPP}`} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: s.ouro, textDecoration: 'none', fontSize: '0.72rem' }}>
-            <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-              <small style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)' }}>Fale conosco</small>
-              <strong style={{ fontSize: '1rem', fontWeight: 500 }}>(35) 99746-1643</strong>
-            </span>
+          <a href={`https://wa.me/${WPP}`} target="_blank" style={{ color: s.ouro, textDecoration: 'none', fontSize: '0.72rem' }}>
+            <small style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(223,192,120,0.6)', display: 'block' }}>Fale conosco</small>
+            <strong style={{ fontSize: '1rem', fontWeight: 500 }}>(35) 99746-1643</strong>
           </a>
         </div>
       </nav>
@@ -228,7 +310,7 @@ export default function Home() {
         )}
       </div>
 
-      <div style={{ width: '100%', height: 2, background: `linear-gradient(90deg, transparent, ${s.ouro}, transparent)` }} />
+      <div className="divisor" />
 
       {/* HERO */}
       <section style={{ minHeight: '80vh', background: s.verde, display: 'grid', gridTemplateColumns: '55% 45%', position: 'relative', overflow: 'hidden' }}>
@@ -279,53 +361,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* BUSCA */}
-      <div id="busca" style={{ background: s.verde, padding: '2rem 5vw' }}>
-        <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${s.borda}`, borderRadius: 2, padding: '1.4rem 1.75rem' }}>
-          <p style={{ fontFamily: s.ftitulo + ', serif', color: s.ouro, fontSize: '1rem', fontWeight: 400, marginBottom: '1.1rem' }}>🔍 Buscar imóveis</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: '0.65rem', alignItems: 'end' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Palavra-chave</label>
-              <input placeholder="Ex: casa 3 quartos..." onChange={e => setBusca(b => ({ ...b, texto: e.target.value }))} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Cidade</label>
-              <select onChange={e => setBusca(b => ({ ...b, cidade: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
-                <option value="">Todas</option>
-                {CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo</label>
-              <select onChange={e => setBusca(b => ({ ...b, tipo: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
-                <option value="">Todos</option>
-                {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Zona</label>
-              <select onChange={e => setBusca(b => ({ ...b, zona: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
-                <option value="">Todas</option>
-                <option value="urbano">Urbano</option>
-                <option value="rural">Rural</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Bairro</label>
-              <select onChange={e => setBusca(b => ({ ...b, bairro: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
-                <option value="">Todos</option>
-                {bairros.map(b => <option key={b} value={b}>{b}</option>)}
-              </select>
-            </div>
-            <button onClick={() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.4rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, height: 'fit-content' }}>
-              Buscar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="divisor" />
-
       {/* SOBRE */}
       <section id="sobre" style={{ background: s.off, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'center', padding: '5.5rem 7vw' }}>
         <div style={{ position: 'relative' }}>
@@ -350,12 +385,8 @@ export default function Home() {
             Sobre mim <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
           </span>
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>{config.sobre_titulo || 'Jussara Ribeiro'}</h2>
-          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região.'}
-          </p>
-          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança.'}
-          </p>
+          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região.'}</p>
+          <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança.'}</p>
           {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
@@ -382,55 +413,64 @@ export default function Home() {
           </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[['', 'Todos'], ['casa', 'Casas'], ['apartamento', 'Apartamentos'], ['lote', 'Lotes'], ['rural', 'Rural']].map(([v, l]) => (
-              <button key={v} onClick={() => setFiltro(v)} style={{ padding: '0.45rem 1.1rem', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', border: `1px solid ${filtro === v ? s.verde : 'rgba(4,49,55,0.18)'}`, background: filtro === v ? s.off : 'transparent', color: filtro === v ? s.verde : s.cinza, cursor: 'pointer', borderRadius: 1, fontFamily: s.ftexto + ', sans-serif' }}>{l}</button>
+              <button key={v} onClick={() => { setFiltro(v); setVerTodos(false) }} style={{ padding: '0.45rem 1.1rem', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', border: `1px solid ${filtro === v ? s.verde : 'rgba(4,49,55,0.18)'}`, background: filtro === v ? s.off : 'transparent', color: filtro === v ? s.verde : s.cinza, cursor: 'pointer', borderRadius: 1, fontFamily: s.ftexto + ', sans-serif' }}>{l}</button>
             ))}
           </div>
         </div>
         {imoveisFiltrados.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: s.cinza, border: `1.5px dashed rgba(4,49,55,0.1)`, borderRadius: 2 }}>
-            <p style={{ fontSize: '0.85rem' }}>Nenhum imóvel encontrado. Adicione imóveis pelo painel admin.</p>
+            <p>Nenhum imóvel encontrado.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '1.6rem' }}>
-            {imoveisFiltrados.map(im => (
-              <div key={im.id} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 14px 44px rgba(4,49,55,0.11)' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '' }}>
-                <Link href={`/imoveis/${im.slug}`} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
-                  {im.fotos && im.fotos.length > 0 ? (
-                    <img src={im.fotos[0]} alt={im.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
-                  ) : (
-                    <p style={{ fontSize: '0.62rem', color: 'rgba(223,192,120,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sem foto</p>
-                  )}
-                  <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
-                  {im.fotos && im.fotos.length > 0 && (
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 3, padding: '0.6rem', background: 'linear-gradient(to top, rgba(4,49,55,0.92) 0%, rgba(4,49,55,0.4) 70%, transparent 100%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', height: '45%' }}>
-                      <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '1.6rem' }}>
+              {imoveisExibidos.map(im => (
+                <div key={im.id} style={{ background: s.branco, border: `1px solid rgba(4,49,55,0.1)`, borderRadius: 2, overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 14px 44px rgba(4,49,55,0.11)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '' }}>
+                  <Link href={`/imoveis/${im.slug}`} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
+                    {im.fotos && im.fotos.length > 0
+                      ? <img src={im.fotos[0]} alt={im.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+                      : <p style={{ fontSize: '0.62rem', color: 'rgba(223,192,120,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sem foto</p>
+                    }
+                    <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
+                    {im.fotos && im.fotos.length > 0 && (
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 3, padding: '0.6rem', background: 'linear-gradient(to top, rgba(4,49,55,0.92) 0%, rgba(4,49,55,0.4) 70%, transparent 100%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', height: '45%' }}>
+                        <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 38, width: 'auto', objectFit: 'contain', opacity: 0.92 }} />
+                      </div>
+                    )}
+                  </Link>
+                  <div style={{ padding: '1.15rem 1.4rem 1.4rem' }}>
+                    <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.65rem', flexWrap: 'wrap' }}>
+                      {[TIPO_LABEL[im.tipo] || im.tipo, im.zona === 'rural' ? 'Rural' : 'Urbano', im.cidade].map(b => (
+                        <span key={b} style={{ fontSize: '0.58rem', letterSpacing: '0.09em', textTransform: 'uppercase', padding: '0.18rem 0.55rem', borderRadius: 1, background: s.off, color: s.verde, border: `1px solid rgba(4,49,55,0.1)` }}>{b}</span>
+                      ))}
                     </div>
-                  )}
-                </Link>
-                <div style={{ padding: '1.15rem 1.4rem 1.4rem' }}>
-                  <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.65rem', flexWrap: 'wrap' }}>
-                    {[TIPO_LABEL[im.tipo] || im.tipo, im.zona === 'rural' ? 'Rural' : 'Urbano', im.cidade].map(b => (
-                      <span key={b} style={{ fontSize: '0.58rem', letterSpacing: '0.09em', textTransform: 'uppercase', padding: '0.18rem 0.55rem', borderRadius: 1, background: s.off, color: s.verde, border: `1px solid rgba(4,49,55,0.1)` }}>{b}</span>
-                    ))}
-                  </div>
-                  <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.05rem', fontWeight: 600, color: s.verde, marginBottom: '0.28rem', lineHeight: 1.3 }}>{im.titulo}</p>
-                  <p style={{ fontSize: '0.72rem', color: s.cinza, marginBottom: '0.75rem' }}>{im.bairro}{im.bairro ? ', ' : ''}{im.cidade}</p>
-                  <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '0.9rem', flexWrap: 'wrap' }}>
-                    {im.quartos > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>🛏 {im.quartos} quartos</span>}
-                    {im.area > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>📐 {im.area} m²</span>}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid rgba(4,49,55,0.07)`, paddingTop: '0.9rem' }}>
-                    <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
-                      {im.preco > 0 ? `R$ ${formatarPreco(im.preco)}` : 'Consulte'}
-                    </p>
-                    <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Ver detalhes →</Link>
+                    <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.05rem', fontWeight: 600, color: s.verde, marginBottom: '0.28rem', lineHeight: 1.3 }}>{im.titulo}</p>
+                    <p style={{ fontSize: '0.72rem', color: s.cinza, marginBottom: '0.75rem' }}>{im.bairro}{im.bairro ? ', ' : ''}{im.cidade}</p>
+                    <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '0.9rem', flexWrap: 'wrap' }}>
+                      {im.quartos > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>🛏 {im.quartos} quartos</span>}
+                      {im.area > 0 && <span style={{ fontSize: '0.72rem', color: s.cinza }}>📐 {im.area} m²</span>}
+                    </div>
+                    <div style={{ borderTop: `1px solid rgba(4,49,55,0.07)`, paddingTop: '0.9rem' }}>
+                      <p style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1.15rem', color: s.verde, fontWeight: 600 }}>
+                        {im.preco > 0 ? `R$ ${formatarPreco(im.preco)}` : 'Consulte'}
+                      </p>
+                      <p style={{ fontSize: '0.62rem', color: s.cinza, marginTop: '0.15rem', fontStyle: 'italic' }}>* Valor sujeito a alteração</p>
+                      <Link href={`/imoveis/${im.slug}`} style={{ fontSize: '0.65rem', color: s.ouro, textDecoration: 'none', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'inline-block', marginTop: '0.5rem' }}>Ver detalhes →</Link>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+            {imoveisFiltrados.length > 3 && (
+              <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+                <button onClick={() => setVerTodos(!verTodos)} style={{ background: 'transparent', border: `2px solid ${s.verde}`, color: s.verde, padding: '0.9rem 2.5rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>
+                  {verTodos ? '← Ver menos' : `Ver todos os ${imoveisFiltrados.length} imóveis →`}
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </section>
 
@@ -443,9 +483,7 @@ export default function Home() {
             Assessoria <span style={{ display: 'block', width: 22, height: 1, background: '#B89A50' }} />
           </span>
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.verde, marginBottom: '1rem' }}>{config.juridico_titulo || 'Assessoria Jurídica Imobiliária'}</h2>
-          <p style={{ fontSize: '0.9rem', color: s.cinza, lineHeight: 1.85, maxWidth: 620, margin: '0 auto', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.juridico_subtitulo || 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado.'}
-          </p>
+          <p style={{ fontSize: '0.9rem', color: s.cinza, lineHeight: 1.85, maxWidth: 620, margin: '0 auto', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{config.juridico_subtitulo || 'Além da intermediação na compra e venda de imóveis, oferecemos suporte jurídico especializado.'}</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
           {[
@@ -480,9 +518,7 @@ export default function Home() {
             Fale comigo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro, opacity: 0.5 }} />
           </span>
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, color: s.branco, marginBottom: '0.9rem' }}>{config.contato_titulo || 'Vamos encontrar\no imóvel ideal?'}</h2>
-          <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem', fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.contato_subtitulo || 'Entre em contato para agendar uma visita ou solicitar avaliação gratuita.'}
-          </p>
+          <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.88rem', lineHeight: 1.85, maxWidth: 520, fontWeight: 300, marginBottom: '2rem', fontFamily: s.ftexto + ', sans-serif' }}>{config.contato_subtitulo || 'Entre em contato para agendar uma visita ou solicitar avaliação gratuita.'}</p>
           {[
             { icon: '📞', label: 'WhatsApp', value: '(35) 99746-1643', href: `https://wa.me/${WPP}` },
             { icon: '📷', label: 'Instagram', value: `@${config.instagram || 'jussara_ribeirocorretora'}`, href: `https://www.instagram.com/${config.instagram || 'jussara_ribeirocorretora'}/` },
@@ -499,7 +535,7 @@ export default function Home() {
           ))}
         </div>
         <div>
-          <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid rgba(223,192,120,0.18)` }}>
+          <div style={{ display: 'flex', borderBottom: `1px solid rgba(223,192,120,0.18)` }}>
             {['Fale comigo', 'Quero vender', 'Assessoria jurídica'].map((label, i) => (
               <button key={label} onClick={() => {
                 document.getElementById('cp-0')!.style.display = i === 0 ? 'block' : 'none'
@@ -514,136 +550,70 @@ export default function Home() {
           <div id="cp-0" style={{ paddingTop: '1.4rem' }}>
             <form onSubmit={enviarContato} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
-                  <input id="f-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
-                  <input id="f-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label><input id="f-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label><input id="f-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>E-mail</label>
-                <input id="f-email" type="email" placeholder="seu@email.com" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label>
-                <select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                  <option>Comprar imóvel</option><option>Vender imóvel</option><option>Avaliação de imóvel</option><option>Assessoria jurídica imobiliária</option><option>Outro</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Mensagem</label>
-                <textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
-              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>E-mail</label><input id="f-email" type="email" placeholder="seu@email.com" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Interesse</label><select id="f-int" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}><option>Comprar imóvel</option><option>Vender imóvel</option><option>Avaliação de imóvel</option><option>Assessoria jurídica imobiliária</option><option>Outro</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Mensagem</label><textarea id="f-msg" placeholder="Descreva o que você procura..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} /></div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Enviar pelo WhatsApp</button>
             </form>
           </div>
           <div id="cp-1" style={{ paddingTop: '1.4rem', display: 'none' }}>
             <form onSubmit={enviarCaptacao} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
-                  <input id="cap-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
-                  <input id="cap-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label><input id="cap-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label><input id="cap-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo</label>
-                  <select id="cap-tipo" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                    {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Zona</label>
-                  <select id="cap-zona" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                    <option value="urbano">Urbano</option><option value="rural">Rural</option>
-                  </select>
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Tipo</label><select id="cap-tipo" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>{Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Zona</label><select id="cap-zona" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}><option value="urbano">Urbano</option><option value="rural">Rural</option></select></div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                {[{ id: 'cap-cidade', label: 'Cidade', placeholder: 'Ex: Campo Belo' }, { id: 'cap-bairro', label: 'Bairro', placeholder: 'Ex: Centro' }, { id: 'cap-area', label: 'Área (m²)', placeholder: 'Ex: 250' }, { id: 'cap-valor', label: 'Valor pretendido', placeholder: 'Ex: 350.000' }].map(f => (
-                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label>
-                    <input id={f.id} placeholder={f.placeholder} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                  </div>
+                {[{ id: 'cap-cidade', label: 'Cidade', ph: 'Ex: Campo Belo' }, { id: 'cap-bairro', label: 'Bairro', ph: 'Ex: Centro' }, { id: 'cap-area', label: 'Área (m²)', ph: 'Ex: 250' }, { id: 'cap-valor', label: 'Valor pretendido', ph: 'Ex: 350.000' }].map(f => (
+                  <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>{f.label}</label><input id={f.id} placeholder={f.ph} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
                 ))}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label>
-                <textarea id="cap-desc" placeholder="Quartos, banheiros, garagem..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
-              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descrição</label><textarea id="cap-desc" placeholder="Quartos, banheiros, garagem..." rows={3} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} /></div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Enviar pelo WhatsApp</button>
             </form>
           </div>
           <div id="cp-2" style={{ paddingTop: '1.4rem', display: 'none' }}>
             <form onSubmit={enviarJuridico} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label>
-                  <input id="j-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label>
-                  <input id="j-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} />
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Seu nome</label><input id="j-nome" type="text" placeholder="Nome completo" required style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Telefone</label><input id="j-tel" type="tel" placeholder="(00) 00000-0000" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none' }} /></div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Serviço</label>
-                <select id="j-servico" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}>
-                  <option>Contratos imobiliários</option><option>Regularização de imóveis</option><option>Usucapião</option><option>Outro</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descreva sua situação</label>
-                <textarea id="j-msg" placeholder="Conte brevemente o que você precisa..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} />
-              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Serviço</label><select id="j-servico" style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', borderRadius: 1, outline: 'none' }}><option>Contratos imobiliários</option><option>Regularização de imóveis</option><option>Usucapião</option><option>Outro</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}><label style={{ fontSize: '0.62rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>Descreva sua situação</label><textarea id="j-msg" placeholder="Conte brevemente o que você precisa..." rows={4} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.75rem 0.9rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', resize: 'vertical' }} /></div>
               <button type="submit" style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem 2rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%' }}>Falar com o setor jurídico</button>
             </form>
           </div>
         </div>
       </section>
 
-      {/* VÍDEO */}
       {config.video_cidade && (
-        <section style={{ background: '#021e22', padding: '0', position: 'relative', overflow: 'hidden' }}>
+        <section style={{ background: '#021e22', padding: '0', overflow: 'hidden' }}>
           <div style={{ textAlign: 'center', padding: '2.5rem 5vw 1.5rem' }}>
-            <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
-              Campo Belo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} />
-            </span>
+            <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'inline-flex', alignItems: 'center', gap: 9 }}>Campo Belo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} /></span>
             <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.4rem, 2vw, 2rem)', fontWeight: 400, color: s.branco, marginTop: '0.5rem' }}>Nossa cidade</h2>
           </div>
           <div style={{ width: '100%', maxHeight: 480, overflow: 'hidden' }}>
-            {config.video_cidade_tipo === 'upload' ? (
-              <video src={config.video_cidade} autoPlay muted loop playsInline style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }} />
-            ) : (
-              <iframe
-                src={`https://www.youtube.com/embed/${config.video_cidade.split('v=')[1]?.split('&')[0] || config.video_cidade.split('youtu.be/')[1]}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0`}
-                style={{ width: '100%', height: 480, border: 'none', display: 'block' }}
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-              />
-            )}
+            {config.video_cidade_tipo === 'upload'
+              ? <video src={config.video_cidade} autoPlay muted loop playsInline style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }} />
+              : <iframe src={`https://www.youtube.com/embed/${config.video_cidade.split('v=')[1]?.split('&')[0] || config.video_cidade.split('youtu.be/')[1]}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0`} style={{ width: '100%', height: 480, border: 'none', display: 'block' }} allow="autoplay; encrypted-media" allowFullScreen />
+            }
           </div>
         </section>
       )}
 
-      {/* FOOTER */}
       <footer style={{ background: '#021e22', padding: '1.75rem 5vw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <span style={{ fontFamily: s.ftitulo + ', serif', fontSize: '1rem', color: s.ouro }}>Jussara Ribeiro Imóveis</span>
         <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>{config.footer_texto || '© 2026 • Campo Belo — Todos os direitos reservados'}</span>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>{config.footer_creci || 'CRECI-MG 52583 • Jussara Ribeiro | CRECI-MG 46481 • Denison Rezende'}</span>
       </footer>
 
-      {/* WPP FLOAT */}
-      <a href={`https://wa.me/${WPP}`} target="_blank" style={{ position: 'fixed', bottom: '1.75rem', right: '1.75rem', zIndex: 400, background: '#25D366', color: 'white', width: 56, height: 56, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', boxShadow: '0 4px 18px rgba(37,211,102,0.38)', fontSize: '1.5rem' }}>
-        💬
-      </a>
+      <a href={`https://wa.me/${WPP}`} target="_blank" style={{ position: 'fixed', bottom: '1.75rem', right: '1.75rem', zIndex: 400, background: '#25D366', color: 'white', width: 56, height: 56, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', boxShadow: '0 4px 18px rgba(37,211,102,0.38)', fontSize: '1.5rem' }}>💬</a>
     </>
   )
 }
