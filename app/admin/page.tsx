@@ -38,6 +38,7 @@ const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'La
 const TIPOS = { casa: 'Casa', apartamento: 'Apartamento', lote: 'Lote / Terreno', comercial: 'Comercial', chacara: 'Chácara / Sítio', fazenda: 'Fazenda' }
 const FONTES_TITULO = ['Cormorant Garamond', 'Playfair Display', 'Merriweather', 'Lora', 'Georgia']
 const FONTES_TEXTO = ['Open Sans', 'Lato', 'Roboto', 'Montserrat', 'Raleway']
+const TOPICOS_PADRAO = ['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel']
 
 const s = { verde: '#043137', ouro: '#DFC078', branco: '#FFFFFF', borda: 'rgba(223,192,120,0.22)' }
 
@@ -67,6 +68,7 @@ const GRUPOS_TEXTO = [
     { chave: 'sobre_p1', label: 'Parágrafo 1', grande: true },
     { chave: 'sobre_p2', label: 'Parágrafo 2', grande: true },
     { chave: 'sobre_foto', label: 'Foto da seção Sobre (fundo claro)', foto: true },
+    { chave: 'sobre_topicos', label: 'Tópicos', topicos: true },
   ]},
   { grupo: '⚖️ Seção Jurídico', campos: [{ chave: 'juridico_titulo', label: 'Título da seção' }, { chave: 'juridico_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'juridico_advogada', label: 'Nome da advogada' }, { chave: 'juridico_oab', label: 'Descrição / OAB' }] },
   { grupo: '📬 Seção Contato', campos: [{ chave: 'contato_titulo', label: 'Título' }, { chave: 'contato_subtitulo', label: 'Subtítulo', grande: true }, { chave: 'localizacao', label: 'Localização' }] },
@@ -84,6 +86,7 @@ export default function AdminPage() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
   const [config, setConfig] = useState<Config>({})
+  const [topicos, setTopicos] = useState<string[]>(TOPICOS_PADRAO)
   const [editando, setEditando] = useState<Imovel | null>(null)
   const [precoTexto, setPrecoTexto] = useState('')
   const [salvando, setSalvando] = useState(false)
@@ -102,6 +105,9 @@ export default function AdminPage() {
       data.forEach((row: { chave: string; valor: string }) => { cfg[row.chave] = row.valor })
       setConfig(cfg)
       if (cfg.senha_admin) setSenhaAdmin(cfg.senha_admin)
+      if (cfg.sobre_topicos) {
+        try { setTopicos(JSON.parse(cfg.sobre_topicos)) } catch {}
+      }
     }
   }
 
@@ -112,9 +118,7 @@ export default function AdminPage() {
       setErroSenha(false)
       fetchImoveis()
       fetchSlides()
-    } else {
-      setErroSenha(true)
-    }
+    } else { setErroSenha(true) }
   }
 
   useEffect(() => {
@@ -151,11 +155,8 @@ export default function AdminPage() {
   }
 
   function gerarSlug(titulo: string) {
-    const base = titulo.toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
-    const sufixo = Date.now().toString(36).slice(-4)
-    return `${base}-${sufixo}`
+    const base = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+    return `${base}-${Date.now().toString(36).slice(-4)}`
   }
 
   async function salvarImovel() {
@@ -163,13 +164,8 @@ export default function AdminPage() {
     setSalvando(true)
     const dados = { ...editando, slug: editando.slug || gerarSlug(editando.titulo) }
     let erro
-    if (editando.id) {
-      const r = await supabase.from('imoveis').update(dados).eq('id', editando.id)
-      erro = r.error
-    } else {
-      const r = await supabase.from('imoveis').insert(dados)
-      erro = r.error
-    }
+    if (editando.id) { const r = await supabase.from('imoveis').update(dados).eq('id', editando.id); erro = r.error }
+    else { const r = await supabase.from('imoveis').insert(dados); erro = r.error }
     setSalvando(false)
     if (erro) setMsg('❌ Erro: ' + erro.message)
     else { setMsg('✅ Imóvel salvo!'); setEditando(null); setPrecoTexto(''); fetchImoveis() }
@@ -185,13 +181,8 @@ export default function AdminPage() {
   async function salvarSlide(slide: Slide) {
     setSalvando(true)
     let erro
-    if (slide.id) {
-      const r = await supabase.from('carrossel').update(slide).eq('id', slide.id)
-      erro = r.error
-    } else {
-      const r = await supabase.from('carrossel').insert(slide)
-      erro = r.error
-    }
+    if (slide.id) { const r = await supabase.from('carrossel').update(slide).eq('id', slide.id); erro = r.error }
+    else { const r = await supabase.from('carrossel').insert(slide); erro = r.error }
     setSalvando(false)
     if (erro) setMsg('❌ Erro: ' + erro.message)
     else { setMsg('✅ Slide salvo!'); fetchSlides() }
@@ -206,8 +197,9 @@ export default function AdminPage() {
 
   async function salvarConfig() {
     setSalvando(true)
+    const cfgParaSalvar = { ...config, sobre_topicos: JSON.stringify(topicos) }
     let erros = 0
-    for (const [chave, valor] of Object.entries(config)) {
+    for (const [chave, valor] of Object.entries(cfgParaSalvar)) {
       try {
         const { data } = await supabase.from('configuracoes').select('id').eq('chave', chave).maybeSingle()
         if (data) await supabase.from('configuracoes').update({ valor }).eq('chave', chave)
@@ -236,67 +228,48 @@ export default function AdminPage() {
   }
 
   async function handleVideoUpload(file: File) {
-    setSalvando(true)
-    setMsg('⏳ Enviando vídeo...')
+    setSalvando(true); setMsg('⏳ Enviando vídeo...')
     try {
       const url = await uploadVideo(file)
       setConfig(c => ({ ...c, video_cidade: url, video_cidade_tipo: 'upload' }))
       setMsg('✅ Vídeo carregado! Clique em Salvar configurações.')
     } catch { setMsg('❌ Erro ao enviar vídeo') }
-    setSalvando(false)
-    setTimeout(() => setMsg(''), 4000)
+    setSalvando(false); setTimeout(() => setMsg(''), 4000)
   }
 
   async function handleFotoHero(file: File) {
-    setSalvando(true)
-    setMsg('⏳ Enviando foto do Hero...')
-    try {
-      const url = await uploadFoto(file, 'imovel')
-      setConfig(c => ({ ...c, hero_foto: url }))
-      setMsg('✅ Foto do Hero carregada! Clique em Salvar todos os textos.')
-    } catch { setMsg('❌ Erro ao enviar foto') }
-    setSalvando(false)
-    setTimeout(() => setMsg(''), 3000)
+    setSalvando(true); setMsg('⏳ Enviando foto...')
+    try { const url = await uploadFoto(file, 'imovel'); setConfig(c => ({ ...c, hero_foto: url })); setMsg('✅ Foto carregada! Clique em Salvar.') }
+    catch { setMsg('❌ Erro ao enviar foto') }
+    setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
 
   async function handleFotoSobre(file: File) {
-    setSalvando(true)
-    setMsg('⏳ Enviando foto do Sobre...')
-    try {
-      const url = await uploadFoto(file, 'imovel')
-      setConfig(c => ({ ...c, sobre_foto: url }))
-      setMsg('✅ Foto do Sobre carregada! Clique em Salvar todos os textos.')
-    } catch { setMsg('❌ Erro ao enviar foto') }
-    setSalvando(false)
-    setTimeout(() => setMsg(''), 3000)
+    setSalvando(true); setMsg('⏳ Enviando foto...')
+    try { const url = await uploadFoto(file, 'imovel'); setConfig(c => ({ ...c, sobre_foto: url })); setMsg('✅ Foto carregada! Clique em Salvar.') }
+    catch { setMsg('❌ Erro ao enviar foto') }
+    setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
 
   async function handleFotosImovel(files: FileList) {
     if (!editando) return
-    setSalvando(true)
-    setMsg('⏳ Enviando fotos...')
+    setSalvando(true); setMsg('⏳ Enviando fotos...')
     const urls: string[] = []
     for (const file of Array.from(files)) {
       try { urls.push(await uploadFoto(file, 'imovel')) } catch (e) { console.error(e) }
     }
     setEditando({ ...editando, fotos: [...(editando.fotos || []), ...urls] })
-    setSalvando(false)
-    setMsg('✅ Fotos adicionadas!')
-    setTimeout(() => setMsg(''), 2000)
+    setSalvando(false); setMsg('✅ Fotos adicionadas!'); setTimeout(() => setMsg(''), 2000)
   }
 
   async function handleFotoSlide(file: File, slide: Slide, idx: number) {
-    setSalvando(true)
-    setMsg('⏳ Enviando imagem...')
+    setSalvando(true); setMsg('⏳ Enviando imagem...')
     try {
       const url = await uploadFoto(file, 'carrossel')
-      const novos = [...slides]
-      novos[idx] = { ...slide, imagem: url }
-      setSlides(novos)
+      const novos = [...slides]; novos[idx] = { ...slide, imagem: url }; setSlides(novos)
       setMsg('✅ Imagem carregada! Clique em Salvar.')
-    } catch { setMsg('❌ Erro ao enviar imagem') }
-    setSalvando(false)
-    setTimeout(() => setMsg(''), 3000)
+    } catch { setMsg('❌ Erro') }
+    setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
 
   const inp = (style?: object) => ({ background: 'rgba(255,255,255,0.05)', border: `1px solid rgba(223,192,120,0.2)`, color: s.branco, padding: '0.7rem 0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.85rem', fontWeight: 300, borderRadius: 1, outline: 'none', width: '100%', ...style })
@@ -313,7 +286,7 @@ export default function AdminPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', textAlign: 'left' }}>
               <label style={lbl}>Senha de acesso</label>
               <input type="password" placeholder="Digite a senha..." value={senhaInput} onChange={e => setSenhaInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && entrar()} style={{ ...inp(), border: erroSenha ? '1px solid rgba(200,50,50,0.6)' : `1px solid rgba(223,192,120,0.2)` }} />
-              {erroSenha && <p style={{ fontSize: '0.72rem', color: '#ff8080', marginTop: '0.25rem' }}>Senha incorreta.</p>}
+              {erroSenha && <p style={{ fontSize: '0.72rem', color: '#ff8080' }}>Senha incorreta.</p>}
             </div>
             <button onClick={entrar} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.9rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>Entrar</button>
           </div>
@@ -335,17 +308,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {msg && (
-        <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>
-          {msg}
-        </div>
-      )}
+      {msg && <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>{msg}</div>}
 
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw', overflowX: 'auto' }}>
         {[['imoveis', '🏡 Imóveis'], ['carrossel', '🖼️ Carrossel'], ['novo', '+ Novo Imóvel'], ['textos', '✏️ Textos'], ['configuracoes', '⚙️ Visual']].map(([v, l]) => (
-          <button key={v} onClick={() => { setAba(v); if (v === 'novo') abrirNovo() }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>
-            {l}
-          </button>
+          <button key={v} onClick={() => { setAba(v); if (v === 'novo') abrirNovo() }} style={{ background: 'transparent', border: 'none', borderBottom: aba === v ? `2px solid ${s.ouro}` : '2px solid transparent', color: aba === v ? s.ouro : 'rgba(255,255,255,0.4)', padding: '1rem 1.5rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>{l}</button>
         ))}
       </div>
 
@@ -358,9 +325,7 @@ export default function AdminPage() {
               <button onClick={abrirNovo} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo imóvel</button>
             </div>
             {imoveis.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}>
-                <p>Nenhum imóvel cadastrado ainda.</p>
-              </div>
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', border: `1.5px dashed rgba(223,192,120,0.2)`, borderRadius: 2 }}><p>Nenhum imóvel cadastrado ainda.</p></div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {imoveis.map(im => (
@@ -419,9 +384,9 @@ export default function AdminPage() {
                 <div style={campo}>
                   <label style={lbl}>Fotos do imóvel</label>
                   <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative' }}>
-                    <input type="file" multiple accept="image/*,.heic,.heif" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                    <input type="file" multiple accept="image/*" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                     <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>📸 Clique para adicionar fotos</p>
-                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP, HEIC • Múltiplas fotos permitidas</p>
+                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP • Múltiplas fotos permitidas</p>
                   </div>
                   {editando.fotos && editando.fotos.length > 0 && (
                     <div>
@@ -532,6 +497,19 @@ export default function AdminPage() {
                           <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>📸 {config.sobre_foto ? 'Trocar foto do fundo claro' : 'Enviar foto do fundo claro'}</p>
                         </div>
                       </div>
+                    ) : (f as any).topicos ? (
+                      <div>
+                        <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Adicione, edite ou remova os tópicos que aparecem na seção Sobre.</p>
+                        {topicos.map((t, i) => (
+                          <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                            <input value={t} onChange={e => { const n = [...topicos]; n[i] = e.target.value; setTopicos(n) }} style={{ ...inp(), flex: 1 }} placeholder={`Tópico ${i + 1}`} />
+                            <button onClick={() => setTopicos(topicos.filter((_, j) => j !== i))} style={{ background: 'rgba(200,50,50,0.15)', border: `1px solid rgba(200,50,50,0.3)`, color: '#ff8080', width: 34, height: 34, borderRadius: 1, cursor: 'pointer', fontSize: '1rem', flexShrink: 0 }}>✕</button>
+                          </div>
+                        ))}
+                        <button onClick={() => setTopicos([...topicos, ''])} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: s.ouro, padding: '0.5rem 1rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif', width: '100%', marginTop: '0.5rem' }}>
+                          + Adicionar tópico
+                        </button>
+                      </div>
                     ) : (f as any).grande ? (
                       <textarea value={config[f.chave] || ''} onChange={e => setConfig(c => ({ ...c, [f.chave]: e.target.value }))} rows={3} style={{ ...inp(), resize: 'vertical', minHeight: 80 }} />
                     ) : (
@@ -557,14 +535,14 @@ export default function AdminPage() {
                   <label style={lbl}>Cor principal (fundo)</label>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <input type="color" value={config.cor_principal || '#043137'} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
-                    <input style={{ ...inp(), flex: 1 }} value={config.cor_principal || '#043137'} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} placeholder="#043137" />
+                    <input style={{ ...inp(), flex: 1 }} value={config.cor_principal || '#043137'} onChange={e => setConfig(c => ({ ...c, cor_principal: e.target.value }))} />
                   </div>
                 </div>
                 <div style={campo}>
                   <label style={lbl}>Cor de destaque (ouro)</label>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <input type="color" value={config.cor_destaque || '#DFC078'} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} style={{ width: 48, height: 40, borderRadius: 1, border: `1px solid rgba(223,192,120,0.2)`, cursor: 'pointer', background: 'transparent', padding: 2 }} />
-                    <input style={{ ...inp(), flex: 1 }} value={config.cor_destaque || '#DFC078'} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} placeholder="#DFC078" />
+                    <input style={{ ...inp(), flex: 1 }} value={config.cor_destaque || '#DFC078'} onChange={e => setConfig(c => ({ ...c, cor_destaque: e.target.value }))} />
                   </div>
                 </div>
               </div>
@@ -572,43 +550,31 @@ export default function AdminPage() {
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔤 Fontes</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div style={campo}>
-                  <label style={lbl}>Fonte dos títulos</label>
-                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_titulo || 'Cormorant Garamond'} onChange={e => setConfig(c => ({ ...c, fonte_titulo: e.target.value }))}>
-                    {FONTES_TITULO.map(f => <option key={f} value={f}>{f}</option>)}
-                  </select>
-                </div>
-                <div style={campo}>
-                  <label style={lbl}>Fonte do texto geral</label>
-                  <select style={{ ...inp(), background: s.verde }} value={config.fonte_texto || 'Open Sans'} onChange={e => setConfig(c => ({ ...c, fonte_texto: e.target.value }))}>
-                    {FONTES_TEXTO.map(f => <option key={f} value={f}>{f}</option>)}
-                  </select>
-                </div>
+                <div style={campo}><label style={lbl}>Fonte dos títulos</label><select style={{ ...inp(), background: s.verde }} value={config.fonte_titulo || 'Cormorant Garamond'} onChange={e => setConfig(c => ({ ...c, fonte_titulo: e.target.value }))}>{FONTES_TITULO.map(f => <option key={f} value={f}>{f}</option>)}</select></div>
+                <div style={campo}><label style={lbl}>Fonte do texto geral</label><select style={{ ...inp(), background: s.verde }} value={config.fonte_texto || 'Open Sans'} onChange={e => setConfig(c => ({ ...c, fonte_texto: e.target.value }))}>{FONTES_TEXTO.map(f => <option key={f} value={f}>{f}</option>)}</select></div>
               </div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🎬 Vídeo da Cidade</p>
-              <div style={campo}>
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
-                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo !== 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'link' }))} /> Link (YouTube)
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
-                    <input type="radio" name="video_tipo" checked={config.video_cidade_tipo === 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'upload' }))} /> Upload
-                  </label>
-                </div>
-                {config.video_cidade_tipo === 'upload' ? (
-                  <div>
-                    <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative', marginBottom: '0.75rem' }}>
-                      <input type="file" accept="video/*" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
-                      <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>🎬 Clique para fazer upload do vídeo</p>
-                    </div>
-                    {config.video_cidade && <video src={config.video_cidade} controls style={{ width: '100%', borderRadius: 1, maxHeight: 200 }} />}
-                  </div>
-                ) : (
-                  <input style={inp()} value={config.video_cidade || ''} onChange={e => setConfig(c => ({ ...c, video_cidade: e.target.value, video_cidade_tipo: 'link' }))} placeholder="https://www.youtube.com/watch?v=..." />
-                )}
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
+                  <input type="radio" name="video_tipo" checked={config.video_cidade_tipo !== 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'link' }))} /> Link (YouTube)
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
+                  <input type="radio" name="video_tipo" checked={config.video_cidade_tipo === 'upload'} onChange={() => setConfig(c => ({ ...c, video_cidade_tipo: 'upload' }))} /> Upload
+                </label>
               </div>
+              {config.video_cidade_tipo === 'upload' ? (
+                <div>
+                  <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative', marginBottom: '0.75rem' }}>
+                    <input type="file" accept="video/*" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>🎬 Clique para fazer upload do vídeo</p>
+                  </div>
+                  {config.video_cidade && <video src={config.video_cidade} controls style={{ width: '100%', borderRadius: 1, maxHeight: 200 }} />}
+                </div>
+              ) : (
+                <input style={inp()} value={config.video_cidade || ''} onChange={e => setConfig(c => ({ ...c, video_cidade: e.target.value, video_cidade_tipo: 'link' }))} placeholder="https://www.youtube.com/watch?v=..." />
+              )}
             </div>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.75rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.68rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: s.ouro, marginBottom: '1.25rem' }}>🔒 Segurança</p>
