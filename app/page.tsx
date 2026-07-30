@@ -40,6 +40,13 @@ const TIPO_LABEL: Record<string, string> = {
 const CIDADES = ['Campo Belo', 'Candeias', 'Cristais', 'Santana do Jacaré', 'Lavras']
 const LOGO_URL = 'https://idyezzltmfyxlpljcetk.supabase.co/storage/v1/object/public/fotos/logo-jussara.png'
 
+const TOPICOS_PADRAO = [
+  'Especialista em imóveis residenciais e comerciais',
+  'Atuação em Campo Belo, Candeias, Cristais, Lavras e região',
+  'Parceria com cartórios e assessoria jurídica',
+  'Avaliação gratuita do seu imóvel'
+]
+
 function formatarPreco(preco: number): string {
   return preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -48,8 +55,9 @@ export default function Home() {
   const [imoveis, setImoveis] = useState<Imovel[]>([])
   const [slides, setSlides] = useState<Slide[]>([])
   const [config, setConfig] = useState<Config>({})
+  const [topicos, setTopicos] = useState<string[]>(TOPICOS_PADRAO)
   const [filtro, setFiltro] = useState('')
-  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '' })
+  const [busca, setBusca] = useState({ texto: '', cidade: '', tipo: '', zona: '', bairro: '', vmin: '', vmax: '' })
   const [bairros, setBairros] = useState<string[]>([])
   const [carIdx, setCarIdx] = useState(0)
   const [menuAberto, setMenuAberto] = useState(false)
@@ -94,6 +102,9 @@ export default function Home() {
       const cfg: Config = {}
       data.forEach((row: { chave: string; valor: string }) => { cfg[row.chave] = row.valor })
       setConfig(cfg)
+      if (cfg.sobre_topicos) {
+        try { setTopicos(JSON.parse(cfg.sobre_topicos)) } catch {}
+      }
     }
   }
 
@@ -141,6 +152,8 @@ export default function Home() {
     if (busca.tipo && im.tipo !== busca.tipo) return false
     if (busca.zona && im.zona !== busca.zona) return false
     if (busca.bairro && im.bairro !== busca.bairro) return false
+    if (busca.vmin && im.preco > 0 && im.preco < Number(busca.vmin.replace(/\./g, '').replace(',', '.'))) return false
+    if (busca.vmax && im.preco > 0 && im.preco > Number(busca.vmax.replace(/\./g, '').replace(',', '.'))) return false
     return true
   })
 
@@ -166,6 +179,9 @@ export default function Home() {
     document.head.appendChild(link)
   }, [s.ftitulo, s.ftexto])
 
+  const inpMenu = { background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' } as React.CSSProperties
+  const lblMenu = { fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }
+
   return (
     <>
       <style>{`
@@ -187,10 +203,8 @@ export default function Home() {
         .divisor { width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #DFC078, transparent); }
       `}</style>
 
-      {/* OVERLAY */}
       <div className={`menu-overlay${menuAberto ? ' aberto' : ''}`} onClick={() => setMenuAberto(false)} style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(2,10,12,0.7)' }} />
 
-      {/* MENU LATERAL */}
       <div className={`menu-lateral${menuAberto ? ' aberto' : ''}`} style={{ position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 600, width: 340, background: s.verde, borderRight: `1px solid ${s.borda}`, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '1.5rem', borderBottom: `1px solid ${s.borda}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <img src={LOGO_URL} alt="Jussara Ribeiro" style={{ height: 60, width: 'auto', objectFit: 'contain' }} />
@@ -205,46 +219,55 @@ export default function Home() {
         <div style={{ padding: '1.5rem', borderTop: `1px solid ${s.borda}` }}>
           <p style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '1rem' }}>🔍 Buscar imóveis</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[
-              { label: 'Palavra-chave', tipo: 'input', placeholder: 'Ex: casa 3 quartos...', onChange: (v: string) => setBusca(b => ({ ...b, texto: v })) },
-            ].map(f => (
-              <div key={f.label}>
-                <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>{f.label}</label>
-                <input placeholder={f.placeholder} value={busca.texto} onChange={e => f.onChange(e.target.value)} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }} />
-              </div>
-            ))}
             <div>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Cidade</label>
-              <select value={busca.cidade} onChange={e => setBusca(b => ({ ...b, cidade: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+              <label style={lblMenu}>Palavra-chave</label>
+              <input placeholder="Ex: casa 3 quartos..." value={busca.texto} onChange={e => setBusca(b => ({ ...b, texto: e.target.value }))} style={inpMenu} />
+            </div>
+            <div>
+              <label style={lblMenu}>Cidade</label>
+              <select value={busca.cidade} onChange={e => setBusca(b => ({ ...b, cidade: e.target.value }))} style={{ ...inpMenu, background: s.verde }}>
                 <option value="">Todas</option>
                 {CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Tipo</label>
-              <select value={busca.tipo} onChange={e => setBusca(b => ({ ...b, tipo: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+              <label style={lblMenu}>Tipo</label>
+              <select value={busca.tipo} onChange={e => setBusca(b => ({ ...b, tipo: e.target.value }))} style={{ ...inpMenu, background: s.verde }}>
                 <option value="">Todos</option>
                 {Object.entries(TIPO_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Zona</label>
-              <select value={busca.zona} onChange={e => setBusca(b => ({ ...b, zona: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+              <label style={lblMenu}>Zona</label>
+              <select value={busca.zona} onChange={e => setBusca(b => ({ ...b, zona: e.target.value }))} style={{ ...inpMenu, background: s.verde }}>
                 <option value="">Todas</option>
                 <option value="urbano">Urbano</option>
                 <option value="rural">Rural</option>
               </select>
             </div>
             <div>
-              <label style={{ fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '0.3rem' }}>Bairro</label>
-              <select value={busca.bairro} onChange={e => setBusca(b => ({ ...b, bairro: e.target.value }))} style={{ background: s.verde, border: `1px solid rgba(223,192,120,0.18)`, color: s.branco, padding: '0.6rem 0.85rem', fontSize: '0.8rem', borderRadius: 1, outline: 'none', width: '100%' }}>
+              <label style={lblMenu}>Bairro</label>
+              <select value={busca.bairro} onChange={e => setBusca(b => ({ ...b, bairro: e.target.value }))} style={{ ...inpMenu, background: s.verde }}>
                 <option value="">Todos</option>
                 {bairros.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
+            <div>
+              <label style={lblMenu}>Faixa de valor</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <input placeholder="Mín. R$" value={busca.vmin} onChange={e => setBusca(b => ({ ...b, vmin: e.target.value }))} style={inpMenu} />
+                <input placeholder="Máx. R$" value={busca.vmax} onChange={e => setBusca(b => ({ ...b, vmax: e.target.value }))} style={inpMenu} />
+              </div>
+              <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', marginTop: '0.3rem' }}>Ex: 150000 ou 500000</p>
+            </div>
             <button onClick={() => { setMenuAberto(false); setTimeout(() => document.getElementById('imoveis')?.scrollIntoView({ behavior: 'smooth' }), 400) }} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.75rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1, width: '100%', marginTop: '0.5rem' }}>
               Buscar imóveis
             </button>
+            {(busca.texto || busca.cidade || busca.tipo || busca.zona || busca.bairro || busca.vmin || busca.vmax) && (
+              <button onClick={() => setBusca({ texto: '', cidade: '', tipo: '', zona: '', bairro: '', vmin: '', vmax: '' })} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.2)`, color: 'rgba(255,255,255,0.4)', padding: '0.5rem', fontFamily: s.ftexto + ', sans-serif', fontSize: '0.68rem', cursor: 'pointer', borderRadius: 1, width: '100%' }}>
+                Limpar filtros
+              </button>
+            )}
           </div>
         </div>
         <div style={{ padding: '1.5rem', borderTop: `1px solid ${s.borda}`, marginTop: 'auto' }}>
@@ -254,7 +277,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 300, background: s.verde, borderBottom: `1px solid ${s.borda}`, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5vw', gap: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <button onClick={() => setMenuAberto(true)} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: s.ouro, width: 42, height: 42, borderRadius: 1, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5, flexShrink: 0 }}>
@@ -279,7 +301,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* CARROSSEL */}
       <div id="inicio" style={{ position: 'relative', width: '100%', height: 500, overflow: 'hidden', background: s.verdeM }}>
         {slides.length > 0 ? (
           <>
@@ -312,7 +333,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* HERO */}
       <section style={{ minHeight: '80vh', background: s.verde, display: 'grid', gridTemplateColumns: '55% 45%', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: '45%', height: '100%', background: s.verdeM, clipPath: 'polygon(8% 0, 100% 0, 100% 100%, 0% 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '6vw 4vw 6vw 7vw', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -324,7 +344,7 @@ export default function Home() {
             {config.hero_titulo || 'Realizando o sonho\nde cada família\ncom confiança'}
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, maxWidth: 390, marginBottom: '2rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>
-            {config.hero_subtitulo || 'Compra e venda de imóveis em Campo Belo e região. Atendimento personalizado, segurança e mais de 15 anos de experiência.'}
+            {config.hero_subtitulo || 'Compra e venda de imóveis em Campo Belo e região.'}
           </p>
           <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
             <a href="#imoveis" className="btn-ouro">Ver imóveis</a>
@@ -361,7 +381,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* SOBRE */}
       <section id="sobre" style={{ background: s.off, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'center', padding: '5.5rem 7vw' }}>
         <div style={{ position: 'relative' }}>
           <div style={{ aspectRatio: '3/4', background: s.verde, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -387,8 +406,8 @@ export default function Home() {
           <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.7rem, 2.6vw, 2.6rem)', fontWeight: 400, lineHeight: 1.2, color: s.verde, marginBottom: '1rem' }}>{config.sobre_titulo || 'Jussara Ribeiro'}</h2>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{config.sobre_p1 || 'Sou corretora imobiliária com mais de 15 anos de atuação em Campo Belo e região.'}</p>
           <p style={{ color: s.cinza, fontSize: '0.88rem', lineHeight: 1.9, marginBottom: '1.5rem', fontWeight: 300, fontFamily: s.ftexto + ', sans-serif' }}>{config.sobre_p2 || 'Meu trabalho é construído sobre dois pilares: transparência e confiança.'}</p>
-          {['Especialista em imóveis residenciais e comerciais', 'Atuação em Campo Belo, Candeias, Cristais, Lavras e região', 'Parceria com cartórios e assessoria jurídica', 'Avaliação gratuita do seu imóvel'].map(item => (
-            <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
+          {topicos.map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '0.82rem', color: s.verde, marginBottom: '0.65rem', fontFamily: s.ftexto + ', sans-serif' }}>
               <span style={{ width: 5, height: 5, background: s.ouro, borderRadius: '50%', flexShrink: 0 }} />{item}
             </div>
           ))}
@@ -402,7 +421,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* IMÓVEIS */}
       <section id="imoveis" style={{ background: s.branco, padding: '5.5rem 7vw' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1.25rem' }}>
           <div>
@@ -476,7 +494,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* JURÍDICO */}
       <section id="juridico" style={{ background: s.off, padding: '5.5rem 7vw' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B89A50', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, marginBottom: '0.7rem' }}>
@@ -511,7 +528,6 @@ export default function Home() {
 
       <div className="divisor" />
 
-      {/* CONTATO */}
       <section id="contato" style={{ background: s.verde, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5.5rem', alignItems: 'start', padding: '5.5rem 7vw' }}>
         <div>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'flex', alignItems: 'center', gap: 9, marginBottom: '0.7rem' }}>
@@ -593,7 +609,7 @@ export default function Home() {
       </section>
 
       {config.video_cidade && (
-        <section style={{ background: '#021e22', padding: '0', overflow: 'hidden' }}>
+        <section style={{ background: '#021e22', overflow: 'hidden' }}>
           <div style={{ textAlign: 'center', padding: '2.5rem 5vw 1.5rem' }}>
             <span style={{ fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: s.ouro, display: 'inline-flex', alignItems: 'center', gap: 9 }}>Campo Belo <span style={{ display: 'block', width: 22, height: 1, background: s.ouro }} /></span>
             <h2 style={{ fontFamily: s.ftitulo + ', serif', fontSize: 'clamp(1.4rem, 2vw, 2rem)', fontWeight: 400, color: s.branco, marginTop: '0.5rem' }}>Nossa cidade</h2>
