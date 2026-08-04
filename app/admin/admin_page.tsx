@@ -77,6 +77,38 @@ const GRUPOS_TEXTO = [
   { grupo: '🎬 Vídeo da Cidade', campos: [{ chave: 'video_cidade', label: 'Link do vídeo (YouTube) ou URL do arquivo' }] },
 ]
 
+// ✅ COMPRESSÃO AUTOMÁTICA DE IMAGENS
+async function comprimirImagem(file: File, maxWidth = 1200, qualidade = 0.8): Promise<File> {
+  return new Promise((resolve) => {
+    // Se já é pequeno (< 300KB), não comprime
+    if (file.size < 300 * 1024) { resolve(file); return }
+
+    const img = document.createElement('img')
+    const canvas = document.createElement('canvas')
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      img.onload = () => {
+        const ratio = Math.min(maxWidth / img.width, 1)
+        canvas.width = Math.round(img.width * ratio)
+        canvas.height = Math.round(img.height * ratio)
+
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+        canvas.toBlob((blob) => {
+          if (!blob) { resolve(file); return }
+          const nomeNovo = file.name.replace(/\.(heic|heif|png|webp|bmp)$/i, '.jpg')
+          const novoArquivo = new File([blob], nomeNovo, { type: 'image/jpeg' })
+          resolve(novoArquivo)
+        }, 'image/jpeg', qualidade)
+      }
+      img.src = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function AdminPage() {
   const [autenticado, setAutenticado] = useState(false)
   const [senhaInput, setSenhaInput] = useState('')
@@ -212,8 +244,10 @@ export default function AdminPage() {
   }
 
   async function uploadFoto(file: File, tipo: 'imovel' | 'carrossel'): Promise<string> {
-    const nome = `${tipo}/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, '-')}`
-    const { data, error } = await supabase.storage.from('fotos').upload(nome, file, { upsert: true })
+    // ✅ Comprime antes de fazer upload
+    const fileOtimizado = await comprimirImagem(file)
+    const nome = `${tipo}/${Date.now()}-${fileOtimizado.name.replace(/[^a-z0-9.]/gi, '-')}`
+    const { data, error } = await supabase.storage.from('fotos').upload(nome, fileOtimizado, { upsert: true })
     if (error) throw error
     const { data: url } = supabase.storage.from('fotos').getPublicUrl(data.path)
     return url.publicUrl
@@ -239,35 +273,57 @@ export default function AdminPage() {
 
   async function handleFotoHero(file: File) {
     setSalvando(true); setMsg('⏳ Enviando foto...')
-    try { const url = await uploadFoto(file, 'imovel'); setConfig(c => ({ ...c, hero_foto: url })); setMsg('✅ Foto carregada! Clique em Salvar.') }
-    catch { setMsg('❌ Erro ao enviar foto') }
+    try {
+      const fileOtimizado = await comprimirImagem(file, 1600, 0.85)
+      const nome = `imovel/${Date.now()}-hero.jpg`
+      const { data, error } = await supabase.storage.from('fotos').upload(nome, fileOtimizado, { upsert: true })
+      if (error) throw error
+      const { data: url } = supabase.storage.from('fotos').getPublicUrl(data.path)
+      setConfig(c => ({ ...c, hero_foto: url.publicUrl }))
+      setMsg('✅ Foto carregada! Clique em Salvar.')
+    } catch { setMsg('❌ Erro ao enviar foto') }
     setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
 
   async function handleFotoSobre(file: File) {
     setSalvando(true); setMsg('⏳ Enviando foto...')
-    try { const url = await uploadFoto(file, 'imovel'); setConfig(c => ({ ...c, sobre_foto: url })); setMsg('✅ Foto carregada! Clique em Salvar.') }
-    catch { setMsg('❌ Erro ao enviar foto') }
+    try {
+      const fileOtimizado = await comprimirImagem(file, 1200, 0.85)
+      const nome = `imovel/${Date.now()}-sobre.jpg`
+      const { data, error } = await supabase.storage.from('fotos').upload(nome, fileOtimizado, { upsert: true })
+      if (error) throw error
+      const { data: url } = supabase.storage.from('fotos').getPublicUrl(data.path)
+      setConfig(c => ({ ...c, sobre_foto: url.publicUrl }))
+      setMsg('✅ Foto carregada! Clique em Salvar.')
+    } catch { setMsg('❌ Erro ao enviar foto') }
     setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
 
   async function handleFotosImovel(files: FileList) {
     if (!editando) return
-    setSalvando(true); setMsg('⏳ Enviando fotos...')
+    setSalvando(true)
+    const total = files.length
     const urls: string[] = []
-    for (const file of Array.from(files)) {
-      try { urls.push(await uploadFoto(file, 'imovel')) } catch (e) { console.error(e) }
+    for (let i = 0; i < total; i++) {
+      setMsg(`⏳ Comprimindo e enviando foto ${i + 1} de ${total}...`)
+      try { urls.push(await uploadFoto(files[i], 'imovel')) } catch (e) { console.error(e) }
     }
     setEditando({ ...editando, fotos: [...(editando.fotos || []), ...urls] })
-    setSalvando(false); setMsg('✅ Fotos adicionadas!'); setTimeout(() => setMsg(''), 2000)
+    setSalvando(false)
+    setMsg(`✅ ${urls.length} foto(s) enviada(s) e otimizada(s)!`)
+    setTimeout(() => setMsg(''), 3000)
   }
 
   async function handleFotoSlide(file: File, slide: Slide, idx: number) {
-    setSalvando(true); setMsg('⏳ Enviando imagem...')
+    setSalvando(true); setMsg('⏳ Comprimindo e enviando imagem...')
     try {
-      const url = await uploadFoto(file, 'carrossel')
-      const novos = [...slides]; novos[idx] = { ...slide, imagem: url }; setSlides(novos)
-      setMsg('✅ Imagem carregada! Clique em Salvar.')
+      const fileOtimizado = await comprimirImagem(file, 1920, 0.82)
+      const nome = `carrossel/${Date.now()}-slide.jpg`
+      const { data, error } = await supabase.storage.from('fotos').upload(nome, fileOtimizado, { upsert: true })
+      if (error) throw error
+      const { data: url } = supabase.storage.from('fotos').getPublicUrl(data.path)
+      const novos = [...slides]; novos[idx] = { ...slide, imagem: url.publicUrl }; setSlides(novos)
+      setMsg('✅ Imagem carregada e otimizada!')
     } catch { setMsg('❌ Erro') }
     setSalvando(false); setTimeout(() => setMsg(''), 3000)
   }
@@ -308,7 +364,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {msg && <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>{msg}</div>}
+      {msg && (
+        <div style={{ background: msg.includes('❌') ? 'rgba(200,50,50,0.15)' : 'rgba(50,200,100,0.15)', border: `1px solid ${msg.includes('❌') ? 'rgba(200,50,50,0.3)' : 'rgba(50,200,100,0.3)'}`, color: s.branco, padding: '0.75rem 3vw', fontSize: '0.85rem' }}>
+          {msg}
+        </div>
+      )}
 
       <div style={{ display: 'flex', borderBottom: `1px solid ${s.borda}`, padding: '0 3vw', overflowX: 'auto' }}>
         {[['imoveis', '🏡 Imóveis'], ['carrossel', '🖼️ Carrossel'], ['novo', '+ Novo Imóvel'], ['textos', '✏️ Textos'], ['configuracoes', '⚙️ Visual']].map(([v, l]) => (
@@ -355,6 +415,9 @@ export default function AdminPage() {
               <button onClick={() => { setEditando(null); setPrecoTexto(''); setAba('imoveis') }} style={{ background: 'transparent', border: `1px solid rgba(223,192,120,0.3)`, color: 'rgba(255,255,255,0.5)', padding: '0.4rem 0.8rem', borderRadius: 1, fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'Open Sans, sans-serif' }}>← Voltar</button>
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>{editando.id ? 'Editar imóvel' : 'Novo imóvel'}</h2>
             </div>
+            <div style={{ background: 'rgba(50,200,100,0.08)', border: `1px solid rgba(50,200,100,0.2)`, borderRadius: 1, padding: '0.75rem 1rem', marginBottom: '1.5rem', fontSize: '0.78rem', color: 'rgba(255,255,255,0.6)' }}>
+              ✅ Fotos enviadas pelo admin são automaticamente comprimidas e otimizadas para web
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
               <div>
                 <div style={campo}><label style={lbl}>Título *</label><input style={inp()} value={editando.titulo} onChange={e => setEditando({ ...editando, titulo: e.target.value, slug: gerarSlug(e.target.value) })} placeholder="Ex: Casa residencial 3 quartos" /></div>
@@ -386,7 +449,7 @@ export default function AdminPage() {
                   <div style={{ border: `1.5px dashed rgba(223,192,120,0.25)`, borderRadius: 1, padding: '1.5rem', textAlign: 'center', position: 'relative' }}>
                     <input type="file" multiple accept="image/*" onChange={e => e.target.files && handleFotosImovel(e.target.files)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                     <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>📸 Clique para adicionar fotos</p>
-                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>JPG, PNG, WEBP • Múltiplas fotos permitidas</p>
+                    <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.3rem' }}>Compressão automática • JPG, PNG, WEBP</p>
                   </div>
                   {editando.fotos && editando.fotos.length > 0 && (
                     <div>
@@ -436,6 +499,7 @@ export default function AdminPage() {
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: s.ouro, fontSize: '1.2rem', fontWeight: 400 }}>Carrossel da página inicial</h2>
               <button onClick={() => setSlides([...slides, { imagem: '', legenda: 'Novo slide', subtitulo: '', ordem: slides.length, ativo: true }])} style={{ background: s.ouro, color: s.verde, border: 'none', padding: '0.6rem 1.2rem', fontFamily: 'Open Sans, sans-serif', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 1 }}>+ Novo slide</button>
             </div>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', marginBottom: '1.5rem' }}>Recomendado: imagens 1920 × 500 px. Compressão automática ativada.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {slides.map((sl, idx) => (
                 <div key={sl.id || idx} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(223,192,120,0.12)`, borderRadius: 2, padding: '1.25rem' }}>
@@ -499,7 +563,7 @@ export default function AdminPage() {
                       </div>
                     ) : (f as any).topicos ? (
                       <div>
-                        <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Adicione, edite ou remova os tópicos que aparecem na seção Sobre.</p>
+                        <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Adicione, edite ou remova os tópicos da seção Sobre.</p>
                         {topicos.map((t, i) => (
                           <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
                             <input value={t} onChange={e => { const n = [...topicos]; n[i] = e.target.value; setTopicos(n) }} style={{ ...inp(), flex: 1 }} placeholder={`Tópico ${i + 1}`} />
