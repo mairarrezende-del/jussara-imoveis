@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type Imovel = {
   id: string
@@ -448,7 +449,7 @@ export default function Home() {
                   onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = '' }}>
                   <Link href={`/imoveis/${im.slug}`} style={{ aspectRatio: '16/10', background: s.verde, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
                     {im.fotos && im.fotos.length > 0
-                      ? <img src={im.fotos[0]} alt={im.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+                      ? <Image src={im.fotos[0]} alt={im.titulo} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw" priority={false} />
                       : <p style={{ fontSize: '0.62rem', color: 'rgba(223,192,120,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sem foto</p>
                     }
                     <span style={{ position: 'absolute', top: '0.85rem', left: '0.85rem', background: s.ouro, color: s.verde, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.28rem 0.75rem', borderRadius: 1, fontWeight: 600, zIndex: 2 }}>Venda</span>
